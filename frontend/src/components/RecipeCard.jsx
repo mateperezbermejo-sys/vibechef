@@ -24,7 +24,7 @@ export default function RecipeCard({ recipe }) {
       </div>
 
       <div className="recipe-match">
-        <span className="match-count">✅ {matchCount} ingredientes coinciden</span>
+        <span className="match-count">✅ {matchCount} {matchCount === 1 ? 'ingrediente coincide' : 'ingredientes coinciden'}</span>
         {missingIngredients && missingIngredients.length > 0 && (
           <span className="missing">
             Falta: {missingIngredients.join(', ')}
