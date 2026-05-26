@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database (binary, never commit)
+backend/db.sqlite
+backend/db.sqlite-shm
+backend/db.sqlite-wal
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# ONNX model binary (large file, download separately)
+frontend/public/models/*.onnx
+
+# WASM runtime binaries (installed via npm, not committed)
+frontend/public/ort-wasm/
+
+# Verification / test artifacts (root-level only)
+screenshots/
+test_*.jpg
+verify_*.mjs
+/package.json
+/package-lock.json
+
+# Dev server log files
+*.err
+server.log
+dev.log
+
+# Claude Code internals
+.claude/

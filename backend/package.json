@@ -1,0 +1,22 @@
+{
+  "name": "vibechef-backend",
+  "version": "1.0.0",
+  "description": "VibeChef backend — Express + SQLite recipe matching engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --experimental-sqlite server.js",
+    "dev": "nodemon --exec \"node --experimental-sqlite\" server.js",
+    "migrate": "node --experimental-sqlite db/migrate.js",
+    "seed": "node --experimental-sqlite db/seed.js",
+    "setup": "node --experimental-sqlite db/migrate.js && node --experimental-sqlite db/seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

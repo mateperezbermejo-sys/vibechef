@@ -1,0 +1,89 @@
+.recipe-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  transition: box-shadow 0.2s;
+}
+
+.recipe-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.recipe-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.recipe-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+.recipe-score {
+  background: #2D7D46;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.recipe-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.meta-pill {
+  font-size: 0.8rem;
+  background: #f4f4f4;
+  border-radius: 20px;
+  padding: 0.2rem 0.6rem;
+  color: #555;
+}
+
+.meta-pill.tag {
+  background: #EAF7EE;
+  color: #2D7D46;
+}
+
+.recipe-match {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.88rem;
+}
+
+.match-count {
+  color: #2D7D46;
+  font-weight: 500;
+}
+
+.missing {
+  color: #999;
+}
+
+.recipe-instructions {
+  margin-top: 0.5rem;
+}
+
+.recipe-instructions summary {
+  font-size: 0.88rem;
+  color: #2D7D46;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.recipe-instructions p {
+  margin: 0.75rem 0 0;
+  font-size: 0.88rem;
+  color: #555;
+  line-height: 1.6;
+}

@@ -1,0 +1,176 @@
+.scan-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.scan-header {
+  margin-bottom: 1.5rem;
+}
+
+.scan-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.6rem;
+  color: #222;
+}
+
+.scan-header p {
+  margin: 0;
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.scan-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.scan-card h2 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.input-row input {
+  flex: 1;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input-row input:focus {
+  border-color: #2D7D46;
+}
+
+.btn-add {
+  padding: 0.65rem 1.2rem;
+  background: #2D7D46;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btn-add:hover {
+  background: #256038;
+}
+
+.ingredient-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.ingredient-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #EAF7EE;
+  border: 1px solid #c3e6cd;
+  border-radius: 20px;
+  padding: 0.3rem 0.4rem 0.3rem 0.8rem;
+  font-size: 0.88rem;
+  color: #2D7D46;
+}
+
+.ingredient-tag button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  color: #5aaa70;
+  padding: 0 0.15rem;
+  transition: color 0.1s;
+}
+
+.ingredient-tag button:hover {
+  color: #e55;
+}
+
+.empty-ingredients {
+  padding: 1rem 0;
+  color: #aaa;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.ingredient-count {
+  font-size: 0.82rem;
+  color: #bbb;
+  text-align: right;
+}
+
+.filter-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.45rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.15s;
+}
+
+.filter-btn:hover {
+  border-color: #2D7D46;
+  color: #2D7D46;
+}
+
+.filter-btn.active {
+  background: #2D7D46;
+  border-color: #2D7D46;
+  color: #fff;
+}
+
+.scan-error {
+  color: #e55;
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+
+.btn-confirm {
+  width: 100%;
+  padding: 1rem;
+  background: #F5A623;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background: #e09010;
+  transform: translateY(-1px);
+}
+
+.btn-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

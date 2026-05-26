@@ -1,0 +1,280 @@
+.vision-scanner {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+.scanner-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.scanner-toggle:hover {
+  background: #f8f8f8;
+}
+
+.toggle-arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+  color: #888;
+}
+
+.toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
+.scanner-body {
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Model status */
+.model-status {
+  margin: 1rem 0;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.status-idle,
+.status-loading {
+  background: #FFF8EE;
+  color: #9A6000;
+}
+
+.status-ready {
+  background: #EAF7EE;
+  color: #2D7D46;
+}
+
+.status-notfound {
+  background: #FFF3CD;
+  color: #856404;
+}
+
+.status-error {
+  background: #FDE8E8;
+  color: #C00;
+}
+
+.model-status code {
+  background: rgba(0,0,0,0.07);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.model-status a {
+  color: inherit;
+  font-weight: 600;
+}
+
+/* Controls */
+.scanner-controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.btn-cam {
+  padding: 0.6rem 1.2rem;
+  background: #2D7D46;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-cam:hover:not(:disabled) {
+  background: #256038;
+}
+
+.btn-cam:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-cam-stop {
+  padding: 0.6rem 1.2rem;
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-cam-stop:hover {
+  background: #bb2d3b;
+}
+
+.btn-upload {
+  padding: 0.6rem 1.2rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-upload:hover:not(:disabled) {
+  border-color: #2D7D46;
+  color: #2D7D46;
+}
+
+.btn-upload:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Viewport */
+.scanner-viewport {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  max-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scanner-video,
+.scanner-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  display: block;
+}
+
+.scanner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Analyze button */
+.btn-analyze {
+  width: 100%;
+  padding: 0.75rem;
+  background: #1a6ebd;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background 0.15s;
+}
+
+.btn-analyze:hover:not(:disabled) {
+  background: #155ca0;
+}
+
+.btn-analyze:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Detections */
+.detections-box {
+  background: #F8FDF9;
+  border: 1px solid #c3e6cd;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.detections-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2D7D46;
+  margin: 0 0 0.75rem;
+}
+
+.detections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.detection-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.det-name {
+  font-weight: 600;
+  color: #222;
+  text-transform: capitalize;
+}
+
+.det-class {
+  color: #888;
+  font-size: 0.82rem;
+}
+
+.det-score {
+  margin-left: auto;
+  background: #2D7D46;
+  color: #fff;
+  padding: 0.1rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.btn-add-detected {
+  width: 100%;
+  padding: 0.65rem;
+  background: #2D7D46;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-add-detected:hover {
+  background: #256038;
+}
+
+.no-detections-hint {
+  font-size: 0.85rem;
+  color: #aaa;
+  text-align: center;
+  margin: 0;
+}
