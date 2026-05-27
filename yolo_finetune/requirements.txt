@@ -1,0 +1,24 @@
+# VibeChef YOLO fine-tune — Python dependencies
+# Tested with Python 3.10+
+
+# Core training library (includes PyTorch dependency resolution)
+ultralytics>=8.2.0
+
+# Data collection from Open Images v7
+fiftyone>=0.24.0
+
+# ONNX export verification (optional — Ultralytics handles export internally)
+onnx>=1.16.0
+onnxruntime>=1.18.0      # CPU version for export verification on dev machines
+
+# Utilities
+Pillow>=10.0.0
+numpy>=1.24.0
+tqdm>=4.66.0
+PyYAML>=6.0
+
+# Optional: GPU training on NVIDIA
+# torch and torchvision are installed automatically by ultralytics.
+# If you have CUDA, run:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+# after installing the requirements above.

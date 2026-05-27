@@ -8,22 +8,30 @@ export default function HistoryPage() {
 
   useEffect(() => {
     api.pantry.history()
-      .then((data) => setHistory(data.history))
+      .then((data) => setHistory(data.history || []))
       .catch(() => setHistory([]))
       .finally(() => setLoading(false));
   }, []);
 
   return (
     <div className="history-page">
-      <h1>🥫 Tu Despensa</h1>
-      <p className="history-sub">Historial completo de ingredientes detectados</p>
+      <div className="history-header">
+        <h1>Tu Despensa</h1>
+        <p className="history-sub">Historial completo de ingredientes detectados y su frecuencia</p>
+      </div>
 
       {loading ? (
-        <div className="loading-msg">Cargando historial...</div>
+        <div className="history-loading">
+          <div className="skel-table">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="skel-row-item" />
+            ))}
+          </div>
+        </div>
       ) : history.length === 0 ? (
-        <div className="empty-state">
-          <span>📦</span>
-          <p>Tu historial está vacío. Empieza escaneando ingredientes.</p>
+        <div className="history-empty">
+          <p className="history-empty-title">Sin historial todavía</p>
+          <p>Escanea tus primeros ingredientes para construir tu despensa.</p>
         </div>
       ) : (
         <div className="history-table-wrapper">

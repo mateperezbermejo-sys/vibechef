@@ -1,0 +1,16 @@
+# Training artifacts (large — do NOT commit)
+runs/
+dataset/
+*.onnx
+*.pt
+*.pth
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# FiftyOne cache (stored in ~/.fiftyone globally, not here)
+# Nothing to ignore locally

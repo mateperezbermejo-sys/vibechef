@@ -4,6 +4,9 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const pantryRoutes = require('./routes/pantry');
 const recipesRoutes = require('./routes/recipes');
+const allergiesRoutes = require('./routes/allergies');
+const correctionsRoutes = require('./routes/corrections');
+const menusRoutes = require('./routes/menus');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,6 +21,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/pantry', pantryRoutes);
 app.use('/api/recipes', recipesRoutes);
+app.use('/api/allergies', allergiesRoutes);
+app.use('/api/corrections', correctionsRoutes);
+app.use('/api/menus', menusRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada.' });

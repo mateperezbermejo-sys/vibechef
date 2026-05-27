@@ -1,38 +1,52 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { loadModel, detectIngredients } from '../services/visionAgent';
+import { loadModel, detectIngredients, applyUserCorrections } from '../services/visionAgent';
+import { api } from '../services/api';
 import './VisionScanner.css';
 
 const MODEL_INSTRUCTIONS_URL =
   'https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.onnx';
 
 export default function VisionScanner({ onDetected }) {
-  const videoRef = useRef(null);
+  const videoRef   = useRef(null);
   const overlayRef = useRef(null);
-  const fileRef = useRef(null);
+  const fileRef    = useRef(null);
 
-  const [modelStatus, setModelStatus] = useState('idle'); // idle|loading|ready|notfound|error
-  const [stream, setStream] = useState(null);
-  const [mode, setMode] = useState('idle'); // idle|webcam|image
-  const [analyzing, setAnalyzing] = useState(false);
-  const [detections, setDetections] = useState([]);
-  const [capturedSrc, setCapturedSrc] = useState(null);
-  const [expanded, setExpanded] = useState(false);
+  const [modelStatus, setModelStatus]     = useState('idle');
+  const [modelMode, setModelMode]         = useState('coco'); // 'coco' | 'vibechef'
+  const [stream, setStream]               = useState(null);
+  const [mode, setMode]                   = useState('idle');
+  const [analyzing, setAnalyzing]         = useState(false);
+  const [detections, setDetections]       = useState([]);
+  const [capturedSrc, setCapturedSrc]     = useState(null);
+  const [expanded, setExpanded]           = useState(false);
+  const [corrections, setCorrections]     = useState({}); // { yolo_class: ingredient }
+  const [overrides, setOverrides]         = useState({});
+  const [editingIdx, setEditingIdx]       = useState(null);
+  const [savingIdx, setSavingIdx]         = useState(null);
 
-  // Load the ONNX model when the panel is first expanded
+  // Load model + user corrections when panel first opens
   useEffect(() => {
-    if (!expanded || modelStatus !== 'idle') return;
-    setModelStatus('loading');
-    loadModel((msg) => setModelStatus(msg)).then((result) => {
-      if (result.success) setModelStatus('ready');
-      else if (result.notFound) setModelStatus('notfound');
-      else setModelStatus('error');
-    });
+    if (!expanded) return;
+    if (modelStatus === 'idle') {
+      setModelStatus('loading');
+      loadModel((msg) => setModelStatus(msg)).then((result) => {
+        if (result.success) {
+          setModelStatus('ready');
+          setModelMode(result.mode || 'coco');
+        } else if (result.notFound) {
+          setModelStatus('notfound');
+        } else {
+          setModelStatus('error');
+        }
+      });
+    }
+    api.corrections.get()
+      .then((data) => setCorrections(data.corrections || {}))
+      .catch(() => {});
   }, [expanded]);
 
   // Stop webcam on unmount
-  useEffect(() => {
-    return () => stopWebcam();
-  }, []);
+  useEffect(() => () => stopWebcam(), []);
 
   function stopWebcam() {
     if (stream) {
@@ -51,6 +65,8 @@ export default function VisionScanner({ onDetected }) {
       setStream(s);
       setMode('webcam');
       setDetections([]);
+      setOverrides({});
+      setEditingIdx(null);
       setCapturedSrc(null);
       clearOverlay();
     } catch {
@@ -62,6 +78,7 @@ export default function VisionScanner({ onDetected }) {
     stopWebcam();
     setMode('idle');
     setDetections([]);
+    setOverrides({});
     clearOverlay();
   }
 
@@ -71,88 +88,103 @@ export default function VisionScanner({ onDetected }) {
     stopWebcam();
     setMode('image');
     setDetections([]);
+    setOverrides({});
+    setEditingIdx(null);
     clearOverlay();
-
-    const url = URL.createObjectURL(file);
-    setCapturedSrc(url);
+    setCapturedSrc(URL.createObjectURL(file));
     e.target.value = '';
   }
 
   const runInference = useCallback(async () => {
     const source = mode === 'webcam' ? videoRef.current : null;
 
+    async function processSource(src) {
+      setAnalyzing(true);
+      try {
+        const raw  = await detectIngredients(src);
+        const dets = applyUserCorrections(raw, corrections);
+        setDetections(dets);
+        setOverrides({});
+        setEditingIdx(null);
+        drawOnOverlay(dets, src.videoWidth ?? src.naturalWidth, src.videoHeight ?? src.naturalHeight);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setAnalyzing(false);
+      }
+    }
+
     if (mode === 'image' && capturedSrc) {
       const img = new Image();
-      img.onload = async () => {
-        setAnalyzing(true);
-        try {
-          const dets = await detectIngredients(img);
-          setDetections(dets);
-          drawOnOverlay(dets, img.naturalWidth, img.naturalHeight);
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setAnalyzing(false);
-        }
-      };
+      img.onload = () => processSource(img);
       img.src = capturedSrc;
       return;
     }
-
-    if (!source) return;
-    setAnalyzing(true);
-    try {
-      const dets = await detectIngredients(source);
-      setDetections(dets);
-      drawOnOverlay(dets, source.videoWidth, source.videoHeight);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setAnalyzing(false);
-    }
-  }, [mode, capturedSrc]);
+    if (source) processSource(source);
+  }, [mode, capturedSrc, corrections]);
 
   function clearOverlay() {
     const canvas = overlayRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
   }
 
   function drawOnOverlay(dets, origW, origH) {
     const canvas = overlayRef.current;
     if (!canvas || !origW || !origH) return;
-
-    canvas.width = origW;
+    canvas.width  = origW;
     canvas.height = origH;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, origW, origH);
 
     for (const det of dets) {
       const [x1, y1, x2, y2] = det.box;
-      const bw = x2 - x1;
-      const bh = y2 - y1;
+      const color = det.needsReview ? '#F5A623' : '#2D7D46';
+      ctx.strokeStyle = color;
+      ctx.lineWidth   = Math.max(2, origW / 200);
+      ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
 
-      ctx.strokeStyle = '#2D7D46';
-      ctx.lineWidth = Math.max(2, origW / 200);
-      ctx.strokeRect(x1, y1, bw, bh);
-
-      const label = `${det.ingredient} ${(det.score * 100).toFixed(0)}%`;
+      const label    = `${det.ingredient ?? '?'} ${(det.score * 100).toFixed(0)}%`;
       const fontSize = Math.max(14, origW / 40);
       ctx.font = `bold ${fontSize}px system-ui`;
       const textW = ctx.measureText(label).width;
-
-      ctx.fillStyle = '#2D7D46';
+      ctx.fillStyle = color;
       ctx.fillRect(x1, y1 - fontSize - 6, textW + 10, fontSize + 8);
       ctx.fillStyle = '#fff';
       ctx.fillText(label, x1 + 5, y1 - 6);
     }
   }
 
+  // Effective ingredient for a detection (override → corrected-by-history → mapped)
+  function effectiveIngredient(det, idx) {
+    if (overrides[idx] !== undefined) return overrides[idx];
+    return det.ingredient;
+  }
+
+  async function handleSaveCorrection(det, idx) {
+    const chosen = effectiveIngredient(det, idx);
+    if (!chosen) return;
+    setSavingIdx(idx);
+    try {
+      await api.corrections.save(det.className, chosen);
+      setCorrections((prev) => ({ ...prev, [det.className]: chosen }));
+      setEditingIdx(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingIdx(null);
+    }
+  }
+
   function addToList() {
-    const unique = [...new Set(detections.map((d) => d.ingredient))];
+    const mapped = detections
+      .map((det, idx) => effectiveIngredient(det, idx))
+      .filter(Boolean);
+    const unique = [...new Set(mapped)];
     onDetected(unique);
     setDetections([]);
+    setOverrides({});
+    setEditingIdx(null);
     clearOverlay();
   }
 
@@ -160,9 +192,8 @@ export default function VisionScanner({ onDetected }) {
 
   return (
     <div className="vision-scanner">
-      {/* Header toggle */}
       <button className="scanner-toggle" onClick={() => setExpanded((v) => !v)}>
-        <span>🤖 Vision Agent — YOLOv8 local</span>
+        <span>Vision Agent — YOLOv8 local</span>
         <span className={`toggle-arrow ${expanded ? 'open' : ''}`}>▾</span>
       </button>
 
@@ -173,7 +204,21 @@ export default function VisionScanner({ onDetected }) {
             {modelStatus === 'idle' && '⏳ Iniciando...'}
             {modelStatus === 'loading' && '⏳ Cargando modelo ONNX...'}
             {typeof modelStatus === 'string' && modelStatus.startsWith('Cargando') && modelStatus}
-            {modelStatus === 'ready' && '✅ Modelo YOLOv8n listo'}
+            {modelStatus === 'ready' && (
+              <span className="model-ready-row">
+                <span>✅ Modelo listo —</span>
+                {modelMode === 'vibechef' ? (
+                  <span className="model-badge vibechef">VibeChef 30 clases</span>
+                ) : (
+                  <span className="model-badge coco" title="Solo 11 clases alimentarias. Entrena el modelo VibeChef para mejorar la precisión.">
+                    COCO (cobertura limitada)
+                  </span>
+                )}
+                {modelMode === 'coco' && (
+                  <a href="/settings" className="model-upgrade-hint">mejorar →</a>
+                )}
+              </span>
+            )}
             {modelStatus === 'notfound' && (
               <>
                 ⚠️ Modelo no encontrado. Descarga{' '}
@@ -190,11 +235,7 @@ export default function VisionScanner({ onDetected }) {
           {/* Controls */}
           <div className="scanner-controls">
             {mode !== 'webcam' ? (
-              <button
-                className="btn-cam"
-                onClick={startWebcam}
-                disabled={modelStatus !== 'ready'}
-              >
+              <button className="btn-cam" onClick={startWebcam} disabled={modelStatus !== 'ready'}>
                 📷 Activar cámara
               </button>
             ) : (
@@ -209,41 +250,20 @@ export default function VisionScanner({ onDetected }) {
             >
               📁 Subir imagen
             </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileUpload}
-            />
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileUpload} />
           </div>
 
-          {/* Viewport: video or image + canvas overlay */}
+          {/* Viewport */}
           {(mode === 'webcam' || mode === 'image') && (
             <div className="scanner-viewport">
-              {mode === 'webcam' && (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="scanner-video"
-                />
-              )}
-              {mode === 'image' && capturedSrc && (
-                <img src={capturedSrc} alt="Imagen analizada" className="scanner-image" />
-              )}
+              {mode === 'webcam' && <video ref={videoRef} autoPlay playsInline muted className="scanner-video" />}
+              {mode === 'image' && capturedSrc && <img src={capturedSrc} alt="Imagen analizada" className="scanner-image" />}
               <canvas ref={overlayRef} className="scanner-overlay" />
             </div>
           )}
 
-          {/* Analyze button */}
           {(mode === 'webcam' || mode === 'image') && (
-            <button
-              className="btn-analyze"
-              onClick={runInference}
-              disabled={!canAnalyze}
-            >
+            <button className="btn-analyze" onClick={runInference} disabled={!canAnalyze}>
               {analyzing ? '⏳ Analizando...' : '🔍 Analizar fotograma'}
             </button>
           )}
@@ -254,15 +274,83 @@ export default function VisionScanner({ onDetected }) {
               <p className="detections-title">
                 Detectado ({detections.length} objeto{detections.length !== 1 ? 's' : ''}):
               </p>
+              {detections.some((d) => d.needsReview) && (
+                <p className="review-hint">
+                  ⚠️ Las detecciones en naranja tienen baja confianza o no tienen mapeo directo. Corrígelas antes de añadir.
+                </p>
+              )}
+
               <div className="detections-list">
-                {detections.map((d, i) => (
-                  <div key={i} className="detection-item">
-                    <span className="det-name">{d.ingredient}</span>
-                    <span className="det-class">({d.className})</span>
-                    <span className="det-score">{(d.score * 100).toFixed(0)}%</span>
-                  </div>
-                ))}
+                {detections.map((det, idx) => {
+                  const eff        = effectiveIngredient(det, idx);
+                  const isEditing  = editingIdx === idx;
+                  const isSaving   = savingIdx === idx;
+                  const wasChanged = overrides[idx] !== undefined && overrides[idx] !== det.ingredient;
+
+                  return (
+                    <div key={idx} className={`detection-item ${det.needsReview ? 'needs-review' : ''}`}>
+                      <div className="det-main-row">
+                        {det.needsReview
+                          ? <span className="det-confidence-badge low">⚠️ {(det.score * 100).toFixed(0)}%</span>
+                          : <span className="det-confidence-badge ok">✅ {(det.score * 100).toFixed(0)}%</span>
+                        }
+                        <span className="det-name">{eff ?? '—'}</span>
+                        <span className="det-class">({det.className})</span>
+                        {det.correctedByHistory && <span className="det-history-badge">historial</span>}
+                        {wasChanged && <span className="det-history-badge changed">editado</span>}
+                        <button
+                          className="btn-det-edit"
+                          onClick={() => setEditingIdx(isEditing ? null : idx)}
+                          title="Corregir ingrediente"
+                        >
+                          ✏️
+                        </button>
+                      </div>
+
+                      {isEditing && (
+                        <div className="det-edit-row">
+                          {/* Quick-pick: candidates that have a mapping */}
+                          <div className="det-candidates">
+                            {det.candidates
+                              .filter((c) => c.ingredient)
+                              .map((c, ci) => (
+                                <button
+                                  key={ci}
+                                  className={`det-candidate-btn ${overrides[idx] === c.ingredient ? 'selected' : ''}`}
+                                  onClick={() => setOverrides((p) => ({ ...p, [idx]: c.ingredient }))}
+                                  title={`${c.className} ${(c.score * 100).toFixed(0)}%`}
+                                >
+                                  {c.ingredient}
+                                </button>
+                              ))}
+                          </div>
+                          {/* Free-text override */}
+                          <input
+                            className="det-custom-input"
+                            type="text"
+                            placeholder="Escribe el ingrediente correcto..."
+                            value={overrides[idx] ?? eff ?? ''}
+                            onChange={(e) => setOverrides((p) => ({ ...p, [idx]: e.target.value.toLowerCase().trim() }))}
+                          />
+                          <div className="det-edit-actions">
+                            <button
+                              className="btn-save-correction"
+                              onClick={() => handleSaveCorrection(det, idx)}
+                              disabled={isSaving || !effectiveIngredient(det, idx)}
+                            >
+                              {isSaving ? 'Guardando...' : 'Guardar en mi perfil'}
+                            </button>
+                            <button className="btn-cancel-edit" onClick={() => setEditingIdx(null)}>
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
+
               <button className="btn-add-detected" onClick={addToList}>
                 ✅ Añadir al listado de ingredientes
               </button>

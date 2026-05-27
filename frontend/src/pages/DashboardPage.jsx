@@ -4,6 +4,31 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import './DashboardPage.css';
 
+const HERO_WORDS = [
+  'tomate', 'huevo', 'pollo', 'arroz', 'pasta',
+  'zanahoria', 'cebolla', 'ajo', 'salmón', 'limón',
+  'espinacas', 'pimiento', 'patata', 'atún', 'aguacate',
+  'queso', 'leche', 'maíz', 'calabacín', 'brócoli',
+];
+
+const STEPS = [
+  {
+    n: '01',
+    title: 'Escanea',
+    desc: 'Apunta la cámara a tu nevera. La IA detecta los ingredientes en tiempo real, en local, sin enviar tus datos.',
+  },
+  {
+    n: '02',
+    title: 'Confirma',
+    desc: 'Revisa y ajusta la lista detectada. Añade alergias o restricciones alimentarias de forma permanente.',
+  },
+  {
+    n: '03',
+    title: 'Cocina',
+    desc: 'Recibe recetas ordenadas por compatibilidad. Sin ingredientes de más, sin desperdicios.',
+  },
+];
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -12,83 +37,103 @@ export default function DashboardPage() {
 
   useEffect(() => {
     api.pantry.predict()
-      .then((data) => setPredictions(data.predictions))
-      .catch(() => setPredictions([]))
+      .then((d) => setPredictions(d.predictions || []))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  function startScanWithPredictions() {
-    const names = predictions.map((p) => p.name_en);
-    navigate('/scan', { state: { preloaded: names } });
+  const firstName = user?.email?.split('@')[0] || 'Chef';
+
+  function handleUsePantry() {
+    navigate('/scan', { state: { preloaded: predictions.map((p) => p.name_en) } });
   }
 
   return (
     <div className="dashboard">
-      <div className="dashboard-hero">
-        <h1>¡Hola, chef! 👋</h1>
-        <p className="hero-sub">¿Qué tienes en casa hoy? Detecta tus ingredientes y encuentra recetas al instante.</p>
-        <button className="btn-scan" onClick={() => navigate('/scan')}>
-          📷 Escanear ingredientes
-        </button>
-      </div>
 
-      <div className="dashboard-section">
-        <h2>Tu despensa habitual</h2>
-        <p className="section-desc">Ingredientes que usas con más frecuencia</p>
+      {/* ── Hero ──────────────────────────────────────────────── */}
+      <section className="hero" aria-label="Presentación">
+        {/* Decorative floating ingredient words */}
+        <div className="hero-bg" aria-hidden="true">
+          {HERO_WORDS.map((word, i) => (
+            <span key={word} className="hero-word" style={{ '--i': i }}>{word}</span>
+          ))}
+        </div>
 
-        {loading ? (
-          <div className="skeleton-grid">
-            {[1,2,3,4,5].map((i) => <div key={i} className="skeleton-pill" />)}
+        {/* Subtle radial glow */}
+        <div className="hero-glow" aria-hidden="true" />
+
+        <div className="hero-content">
+          <span className="hero-overline">Cocina inteligente · Cero desperdicio</span>
+
+          <h1 className="hero-title">
+            Cocina con<br />lo que tienes.
+          </h1>
+
+          <p className="hero-sub">
+            Detecta ingredientes con la cámara, descubre recetas a tu medida y planifica tu semana entera. Todo offline, todo tuyo.
+          </p>
+
+          <div className="hero-actions">
+            <button className="hero-btn-primary" onClick={() => navigate('/scan')}>
+              Escanear ingredientes
+            </button>
+            <button className="hero-btn-secondary" onClick={() => navigate('/menu')}>
+              Generar menú semanal
+            </button>
           </div>
-        ) : predictions.length === 0 ? (
-          <div className="empty-state">
-            <span>🥦</span>
-            <p>Todavía no tienes historial de ingredientes. Empieza escaneando tus primeros ingredientes.</p>
+        </div>
+
+        <div className="hero-scroll" aria-hidden="true"><span /></div>
+      </section>
+
+      {/* ── Pantry prediction ─────────────────────────────────── */}
+      {(loading || predictions.length > 0) && (
+        <section className="dash-section dash-section--white">
+          <div className="dash-inner">
+            <span className="section-label">Tu despensa habitual</span>
+            <h2 className="dash-title">Hola, {firstName}. ¿Repetimos?</h2>
+
+            {loading ? (
+              <div className="skel-row">
+                {Array.from({ length: 7 }).map((_, i) => <div key={i} className="skel-chip" />)}
+              </div>
+            ) : (
+              <>
+                <div className="pantry-chips">
+                  {predictions.map((p) => (
+                    <span key={p.ingredient_id} className="pantry-chip">
+                      <span className="pantry-name">{p.name_en}</span>
+                      <span className="pantry-count">{p.frequency_count}×</span>
+                    </span>
+                  ))}
+                </div>
+                <button className="dash-use-btn" onClick={handleUsePantry}>
+                  Buscar recetas con estos ingredientes
+                </button>
+              </>
+            )}
           </div>
-        ) : (
-          <div className="prediction-grid">
-            {predictions.map((p) => (
-              <div key={p.name_en} className="prediction-chip">
-                <span className="chip-name">{p.name_es}</span>
-                <span className="chip-count">×{p.frequency_count}</span>
+        </section>
+      )}
+
+      {/* ── How it works ──────────────────────────────────────── */}
+      <section className="dash-section">
+        <div className="dash-inner">
+          <span className="section-label">Cómo funciona</span>
+          <h2 className="dash-title">Tres pasos. Cero desperdicio.</h2>
+          <div className="steps-grid">
+            {STEPS.map(({ n, title, desc }) => (
+              <div key={n} className="step-card">
+                <span className="step-n" aria-hidden="true">{n}</span>
+                <h3 className="step-title">{title}</h3>
+                <p className="step-desc">{desc}</p>
               </div>
             ))}
           </div>
-        )}
-
-        {predictions.length > 0 && (
-          <button className="btn-secondary" onClick={startScanWithPredictions}>
-            Usar ingredientes habituales →
-          </button>
-        )}
-      </div>
-
-      <div className="dashboard-section">
-        <h2>¿Cómo funciona?</h2>
-        <div className="how-it-works">
-          <div className="step">
-            <div className="step-icon">📷</div>
-            <div>
-              <strong>1. Escanea</strong>
-              <p>Añade los ingredientes que tienes disponibles</p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="step-icon">✅</div>
-            <div>
-              <strong>2. Confirma</strong>
-              <p>Revisa y ajusta la lista de ingredientes detectados</p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="step-icon">🍽️</div>
-            <div>
-              <strong>3. Cocina</strong>
-              <p>Descubre recetas perfectas para lo que tienes en casa</p>
-            </div>
-          </div>
         </div>
-      </div>
+      </section>
+
     </div>
   );
 }

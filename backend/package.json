@@ -8,15 +8,23 @@
     "dev": "nodemon --exec \"node --experimental-sqlite\" server.js",
     "migrate": "node --experimental-sqlite db/migrate.js",
     "seed": "node --experimental-sqlite db/seed.js",
-    "setup": "node --experimental-sqlite db/migrate.js && node --experimental-sqlite db/seed.js"
+    "setup": "node --experimental-sqlite db/migrate.js && node --experimental-sqlite db/seed.js",
+    "test": "jest --testEnvironment=node"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/__tests__/**/*.test.js"]
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1",
+    "pdf-parse": "^2.4.5"
   },
   "devDependencies": {
+    "jest": "^30.4.2",
     "nodemon": "^3.1.0"
   }
 }

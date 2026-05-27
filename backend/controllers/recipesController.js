@@ -1,4 +1,5 @@
 const { getDb } = require('../db/database');
+const { scoreRecipe, filterByAllergies, sortRecipes } = require('../utils/recipeUtils');
 
 function matchRecipes(req, res) {
   try {
@@ -11,17 +12,21 @@ function matchRecipes(req, res) {
     const db = getDb();
     const normalizedInput = ingredients.map((i) => i.toLowerCase().trim());
 
+    // Load user allergies to apply automatic filtering
+    const allergyRows = db.prepare(
+      'SELECT ingredient_name FROM user_allergies WHERE user_id = ?'
+    ).all(req.userId);
+    const allergies = allergyRows.map((r) => r.ingredient_name);
+
     const allRecipes = db.prepare('SELECT * FROM recipes').all();
 
     const scored = allRecipes.map((recipe) => {
       const recipeIngredients = JSON.parse(recipe.ingredients);
       const tags = JSON.parse(recipe.tags);
-
-      const matchCount = recipeIngredients.filter((ri) => normalizedInput.includes(ri)).length;
-      const missingCount = recipeIngredients.filter((ri) => !normalizedInput.includes(ri)).length;
-
-      // Scoring formula: Score = (Match_Count * 10) - (Missing_Count * 2)
-      const score = matchCount * 10 - missingCount * 2;
+      const {
+        score, matchCount, missingCount,
+        availableUsed, missingIngredients, availableNotUsed, substitutions,
+      } = scoreRecipe(recipeIngredients, normalizedInput);
 
       return {
         id: recipe.id,
@@ -30,25 +35,38 @@ function matchRecipes(req, res) {
         prep_time: recipe.prep_time,
         difficulty: recipe.difficulty,
         tags,
+        source: recipe.source || 'seed',
         ingredients: recipeIngredients,
+        // Subset-match breakdown
+        score,
         matchCount,
         missingCount,
-        missingIngredients: recipeIngredients.filter((ri) => !normalizedInput.includes(ri)),
-        score,
+        availableUsed,
+        missingIngredients,
+        availableNotUsed,
+        substitutions,
       };
     });
 
+    // Keep only recipes with at least 1 matched ingredient
     let filtered = scored.filter((r) => r.score > 0);
 
-    // Apply tag-based filters
+    // Apply allergy filter — remove recipes containing allergens
+    filtered = filterByAllergies(filtered, allergies);
+
+    // Apply tag-based filters requested by the user
     if (filters.length > 0) {
       filtered = filtered.filter((r) => filters.every((f) => r.tags.includes(f)));
     }
 
-    filtered.sort((a, b) => b.score - a.score);
+    filtered = sortRecipes(filtered);
 
-    res.json({ recipes: filtered });
+    res.json({
+      recipes: filtered,
+      appliedAllergies: allergies,
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Error al buscar recetas.' });
   }
 }

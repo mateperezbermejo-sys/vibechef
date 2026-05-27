@@ -1,176 +1,208 @@
 .scan-page {
   max-width: 640px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: var(--sp-8) var(--sp-6);
 }
 
-.scan-header {
-  margin-bottom: 1.5rem;
-}
+/* Header */
+.scan-header { margin-bottom: var(--sp-6); }
 
 .scan-header h1 {
-  margin: 0 0 0.25rem;
-  font-size: 1.6rem;
-  color: #222;
+  font-family: var(--vc-font-head);
+  font-size: 1.65rem;
+  color: var(--vc-ink);
+  margin: 0 0 var(--sp-2);
+  letter-spacing: -0.02em;
 }
 
 .scan-header p {
   margin: 0;
-  color: #888;
-  font-size: 0.95rem;
+  color: var(--vc-muted);
+  font-size: 0.92rem;
 }
 
+/* Cards */
 .scan-card {
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.25rem;
+  background: var(--vc-white);
+  border: 1px solid var(--vc-border-light);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5) var(--sp-6);
+  margin-bottom: var(--sp-4);
+  box-shadow: var(--sh-sm);
 }
 
 .scan-card h2 {
-  margin: 0 0 1rem;
-  font-size: 1rem;
-  color: #333;
+  margin: 0 0 var(--sp-4);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--vc-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--vc-font-body);
 }
 
+/* Input row */
 .input-row {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
 }
 
 .input-row input {
   flex: 1;
   padding: 0.65rem 0.9rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1.5px solid var(--vc-border);
+  border-radius: var(--r-md);
   font-size: 0.95rem;
+  color: var(--vc-ink);
+  background: var(--vc-white);
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
 }
-
 .input-row input:focus {
-  border-color: #2D7D46;
+  border-color: var(--vc-green);
+  box-shadow: var(--sh-focus);
 }
+.input-row input::placeholder { color: var(--vc-muted-light); }
 
 .btn-add {
   padding: 0.65rem 1.2rem;
-  background: #2D7D46;
-  color: #fff;
+  background: var(--vc-green);
+  color: var(--vc-white);
   border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  border-radius: var(--r-md);
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s;
+  transition: background var(--t-fast);
 }
+.btn-add:hover { background: var(--vc-green-deep); }
+.btn-add:disabled { opacity: .45; cursor: not-allowed; }
 
-.btn-add:hover {
-  background: #256038;
-}
-
+/* Ingredient tags */
 .ingredient-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
 }
 
 .ingredient-tag {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  background: #EAF7EE;
+  gap: var(--sp-1);
+  background: var(--vc-green-pale);
   border: 1px solid #c3e6cd;
-  border-radius: 20px;
-  padding: 0.3rem 0.4rem 0.3rem 0.8rem;
-  font-size: 0.88rem;
-  color: #2D7D46;
+  border-radius: var(--r-pill);
+  padding: 0.28rem 0.4rem 0.28rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--vc-green-deep);
 }
-
 .ingredient-tag button {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 1rem;
   line-height: 1;
-  color: #5aaa70;
-  padding: 0 0.15rem;
-  transition: color 0.1s;
+  color: var(--vc-green);
+  padding: 0 0.2rem;
+  transition: color var(--t-fast);
 }
-
-.ingredient-tag button:hover {
-  color: #e55;
-}
+.ingredient-tag button:hover { color: var(--vc-tomato); }
 
 .empty-ingredients {
-  padding: 1rem 0;
-  color: #aaa;
-  font-size: 0.88rem;
+  padding: var(--sp-4) 0;
+  color: var(--vc-muted-light);
+  font-size: 0.85rem;
   text-align: center;
 }
 
 .ingredient-count {
-  font-size: 0.82rem;
-  color: #bbb;
+  font-size: 0.78rem;
+  color: var(--vc-muted-light);
   text-align: right;
+  margin-top: var(--sp-1);
 }
 
-.filter-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+/* Allergy card */
+.allergy-card h2 { display: flex; align-items: center; gap: var(--sp-2); }
+
+.allergy-count {
+  font-size: 0.72rem;
+  background: var(--vc-tomato-pale);
+  color: var(--vc-tomato);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--r-pill);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
 }
+
+.allergy-hint {
+  font-size: 0.82rem;
+  color: var(--vc-muted);
+  margin: calc(-1 * var(--sp-3)) 0 var(--sp-4);
+}
+
+.allergy-empty { font-size: 0.85rem; color: var(--vc-muted-light); margin: 0; }
+
+.allergy-tag {
+  background: var(--vc-tomato-pale) !important;
+  border-color: #f5c6c6 !important;
+  color: var(--vc-tomato) !important;
+}
+.allergy-tag button { color: var(--vc-tomato) !important; }
+.allergy-tag button:hover { color: var(--vc-tomato-hover) !important; }
+
+/* Filters */
+.filter-grid { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 
 .filter-btn {
-  padding: 0.45rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  background: #fff;
-  font-size: 0.88rem;
+  padding: 0.42rem 0.95rem;
+  border: 1.5px solid var(--vc-border);
+  border-radius: var(--r-pill);
+  background: var(--vc-white);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--vc-ink-soft);
   cursor: pointer;
-  color: #555;
-  transition: all 0.15s;
+  transition: all var(--t-fast);
 }
-
-.filter-btn:hover {
-  border-color: #2D7D46;
-  color: #2D7D46;
-}
-
+.filter-btn:hover { border-color: var(--vc-green); color: var(--vc-green); }
 .filter-btn.active {
-  background: #2D7D46;
-  border-color: #2D7D46;
-  color: #fff;
+  background: var(--vc-green);
+  border-color: var(--vc-green);
+  color: var(--vc-white);
 }
 
+/* Error */
 .scan-error {
-  color: #e55;
+  color: var(--vc-tomato);
   font-size: 0.88rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--sp-3);
 }
 
+/* Confirm button */
 .btn-confirm {
   width: 100%;
   padding: 1rem;
-  background: #F5A623;
-  color: #fff;
+  background: var(--vc-tomato);
+  color: var(--vc-white);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--r-lg);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
+  transition: background var(--t-fast), transform var(--t-fast);
 }
-
 .btn-confirm:hover:not(:disabled) {
-  background: #e09010;
+  background: var(--vc-tomato-hover);
   transform: translateY(-1px);
 }
+.btn-confirm:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-.btn-confirm:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+@media (max-width: 640px) {
+  .scan-page  { padding: var(--sp-5) var(--sp-4); }
+  .scan-card  { padding: var(--sp-4) var(--sp-5); }
 }

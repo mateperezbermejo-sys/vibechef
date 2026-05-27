@@ -1,0 +1,169 @@
+.settings-page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--sp-8) var(--sp-6);
+}
+
+/* Header */
+.settings-header { margin-bottom: var(--sp-8); }
+
+.settings-header h1 {
+  font-family: var(--vc-font-head);
+  font-size: 1.7rem;
+  margin: 0 0 var(--sp-2);
+  color: var(--vc-ink);
+  letter-spacing: -0.02em;
+}
+
+.settings-sub {
+  margin: 0;
+  color: var(--vc-muted);
+  font-size: 0.9rem;
+}
+
+/* Cards */
+.settings-card {
+  background: var(--vc-white);
+  border: 1px solid var(--vc-border-light);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-5);
+  box-shadow: var(--sh-sm);
+}
+
+.settings-card h2 {
+  margin: 0 0 var(--sp-5);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--vc-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--vc-font-body);
+}
+
+/* PDF format hint */
+.pdf-format-hint p {
+  font-size: 0.88rem;
+  color: var(--vc-ink-soft);
+  margin: 0 0 var(--sp-4);
+  line-height: 1.6;
+}
+
+.pdf-sample {
+  background: var(--vc-warm);
+  border: 1px solid var(--vc-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 0 0 var(--sp-4);
+  white-space: pre-wrap;
+  color: var(--vc-ink-soft);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.pdf-note {
+  font-size: 0.82rem;
+  color: var(--vc-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+.pdf-note code {
+  background: rgba(0,0,0,.06);
+  padding: 0.05rem 0.35rem;
+  border-radius: var(--r-sm);
+  font-size: .85em;
+  color: var(--vc-ink-soft);
+}
+
+/* Upload controls */
+.pdf-upload-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-4);
+}
+
+.btn-select-pdf {
+  padding: 0.65rem 1.4rem;
+  background: none;
+  border: 1.5px solid var(--vc-border);
+  border-radius: var(--r-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vc-ink-soft);
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+.btn-select-pdf:hover { border-color: var(--vc-green); color: var(--vc-green); }
+
+.pdf-filename {
+  font-size: 0.85rem;
+  color: var(--vc-green);
+  font-weight: 500;
+}
+
+.btn-import-pdf {
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--vc-tomato);
+  color: var(--vc-white);
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.btn-import-pdf:hover:not(:disabled) { background: var(--vc-tomato-hover); }
+.btn-import-pdf:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Results */
+.import-error {
+  margin-top: var(--sp-4);
+  background: var(--vc-tomato-pale);
+  color: var(--vc-tomato);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: 0.88rem;
+}
+
+.import-result {
+  margin-top: var(--sp-4);
+  background: var(--vc-green-pale);
+  border: 1px solid #c3e6cd;
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
+}
+.import-summary {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--vc-green-deep);
+  margin: 0 0 var(--sp-3);
+}
+.import-recipe-list {
+  margin: 0;
+  padding-left: var(--sp-5);
+  font-size: 0.84rem;
+  color: var(--vc-ink-soft);
+}
+.import-recipe-list li { margin-bottom: var(--sp-1); }
+
+/* Info card */
+.info-card p, .info-card ol, .info-card li {
+  font-size: 0.88rem;
+  color: var(--vc-ink-soft);
+  line-height: 1.65;
+}
+.info-card ol { padding-left: var(--sp-5); }
+.info-card li { margin-bottom: var(--sp-2); }
+.info-card p  { margin: 0 0 var(--sp-3); }
+.info-card p:last-child { margin-bottom: 0; }
+.info-card strong { color: var(--vc-ink); }
+
+@media (max-width: 640px) {
+  .settings-page { padding: var(--sp-5) var(--sp-4); }
+  .settings-card { padding: var(--sp-5); }
+}

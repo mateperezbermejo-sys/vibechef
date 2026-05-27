@@ -1,87 +1,100 @@
 .recipes-page {
-  max-width: 760px;
+  max-width: var(--max-content);
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: var(--sp-8) var(--sp-6);
 }
 
 .recipes-header {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
 }
 
 .btn-back {
-  background: none;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
   padding: 0.5rem 0.9rem;
-  font-size: 0.9rem;
+  background: none;
+  border: 1px solid var(--vc-border);
+  border-radius: var(--r-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--vc-muted);
   cursor: pointer;
-  color: #555;
-  white-space: nowrap;
-  margin-top: 0.25rem;
-  transition: all 0.15s;
   flex-shrink: 0;
+  margin-top: 4px;
+  transition: all var(--t-fast);
 }
-
-.btn-back:hover {
-  border-color: #2D7D46;
-  color: #2D7D46;
-}
+.btn-back:hover { border-color: var(--vc-green); color: var(--vc-green); }
 
 .recipes-header h1 {
-  margin: 0 0 0.25rem;
+  font-family: var(--vc-font-head);
   font-size: 1.6rem;
-  color: #222;
+  margin: 0 0 var(--sp-2);
+  color: var(--vc-ink);
+  letter-spacing: -0.02em;
 }
 
 .recipes-sub {
   margin: 0;
   font-size: 0.88rem;
-  color: #888;
+  color: var(--vc-muted);
+  line-height: 1.5;
 }
 
 .recipes-count {
-  font-size: 0.88rem;
-  color: #aaa;
-  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  color: var(--vc-muted-light);
+  margin-bottom: var(--sp-4);
 }
 
 .recipes-grid {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--sp-4);
 }
 
+/* No results */
 .no-results {
   text-align: center;
-  padding: 3rem 0;
-  color: #999;
+  padding: var(--sp-16) 0;
+  color: var(--vc-muted);
 }
-
-.no-results span {
+.no-results-icon {
   font-size: 3rem;
   display: block;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--sp-4);
+  opacity: .6;
 }
+.no-results p { margin-bottom: var(--sp-5); font-size: 0.95rem; }
 
-.no-results p {
-  margin-bottom: 1rem;
-}
-
-.btn-secondary {
-  background: none;
-  border: 1px solid #2D7D46;
-  color: #2D7D46;
-  border-radius: 8px;
-  padding: 0.55rem 1.2rem;
+.btn-try-again {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 1.4rem;
+  background: transparent;
+  color: var(--vc-green);
+  border: 1.5px solid var(--vc-green);
+  border-radius: var(--r-md);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all var(--t-fast);
+}
+.btn-try-again:hover { background: var(--vc-green-pale); }
+
+/* Applied allergy note */
+.allergies-note {
+  font-size: 0.82rem;
+  color: var(--vc-tomato);
+  background: var(--vc-tomato-pale);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-4);
 }
 
-.btn-secondary:hover {
-  background: #EAF7EE;
+@media (max-width: 640px) {
+  .recipes-page { padding: var(--sp-5) var(--sp-4); }
 }

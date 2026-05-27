@@ -1,0 +1,50 @@
+# VibeChef YOLOv8 fine-tune dataset config
+# Classes must match vibechef_classes.json indices exactly.
+
+path: ./dataset          # relative to dataset.yaml location
+train: images/train
+val:   images/val
+test:  images/test       # optional — created by 01_download_open_images.py
+
+nc: 30
+names:
+  0:  apple
+  1:  banana
+  2:  beef
+  3:  bread
+  4:  broccoli
+  5:  butter
+  6:  carrot
+  7:  cheese
+  8:  chicken
+  9:  corn
+  10: cucumber
+  11: egg
+  12: flour
+  13: garlic
+  14: lemon
+  15: lettuce
+  16: milk
+  17: mushroom
+  18: olive oil
+  19: onion
+  20: orange
+  21: pasta
+  22: pepper
+  23: potato
+  24: rice
+  25: salmon
+  26: spinach
+  27: tomato
+  28: tuna
+  29: zucchini
+
+# Notes on data availability (Open Images v7 coverage):
+# ✅ Auto-downloadable (good OI coverage):
+#    apple, banana, bread, broccoli, butter, carrot, cheese, chicken, corn,
+#    cucumber, egg, garlic, lemon, lettuce, milk, mushroom, onion, orange,
+#    pasta, pepper, potato, rice, salmon, spinach, tomato, zucchini
+# ⚠️  Partial coverage (few OI samples, augment manually):
+#    beef (OI class: "Meat"), tuna (limited), butter (limited)
+# ❌ Not in Open Images — requires manual annotation (~50 images each):
+#    flour, olive oil
