@@ -298,6 +298,89 @@
 
 .meal-empty { font-size: 0.85rem; color: var(--vc-muted-light); }
 
+/* ─── Ver receta button ──────────────────────────────────────── */
+.btn-ver-receta {
+  margin-top: var(--sp-3);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--vc-green);
+  cursor: pointer;
+  transition: color var(--t-fast);
+}
+.btn-ver-receta:hover { color: var(--vc-green-deep); }
+
+/* ─── Shopping list panel ────────────────────────────────────── */
+.shopping-panel {
+  margin-top: var(--sp-8);
+  background: var(--vc-white);
+  border: 1px solid var(--vc-border-light);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  box-shadow: var(--sh-sm);
+}
+
+.shopping-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+.shopping-head h2 {
+  margin: 0;
+  font-family: var(--vc-font-head);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--vc-ink);
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.shopping-count {
+  background: var(--vc-tomato-pale);
+  color: var(--vc-tomato);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--r-pill);
+}
+
+.shopping-desc {
+  font-size: 0.82rem;
+  color: var(--vc-muted);
+  margin: 0 0 var(--sp-4);
+  line-height: 1.5;
+}
+
+.shopping-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.shopping-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.9rem;
+  color: var(--vc-ink-soft);
+  text-transform: capitalize;
+}
+
+.shopping-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vc-tomato);
+  flex-shrink: 0;
+}
+
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .menu-page  { padding: var(--sp-5) var(--sp-4); }

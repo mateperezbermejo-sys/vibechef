@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import RecipeModal from '../components/RecipeModal';
 import './MenuPage.css';
 
 const FILTER_OPTIONS = [
@@ -15,17 +16,29 @@ export default function MenuPage() {
   const [inputValue, setInputValue] = useState('');
   const [filters, setFilters] = useState([]);
   const [week, setWeek] = useState(null);
+  const [shoppingList, setShoppingList] = useState([]);
   const [appliedAllergies, setAppliedAllergies] = useState([]);
   const [totalConsidered, setTotalConsidered] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [expandedSlot, setExpandedSlot] = useState(null); // "day-meal" key
+  const [expandedSlot, setExpandedSlot] = useState(null);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   useEffect(() => {
-    api.pantry.history().then((data) => {
-      const names = (data.history || []).map((h) => h.name_en || h.ingredient_name || h.name).filter(Boolean);
-      setIngredients(names.slice(0, 20));
-    }).catch(() => {});
+    function loadLS(key) {
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+    }
+    const fridge = loadLS('vibechef_fridge');
+    const pantry = loadLS('vibechef_pantry');
+    const combined = [...new Set([...fridge, ...pantry])];
+    if (combined.length > 0) {
+      setIngredients(combined);
+    } else {
+      api.pantry.history().then((data) => {
+        const names = (data.history || []).map((h) => h.name_en || h.ingredient_name || h.name).filter(Boolean);
+        setIngredients(names.slice(0, 20));
+      }).catch(() => {});
+    }
   }, []);
 
   function addIngredient() {
@@ -47,16 +60,14 @@ export default function MenuPage() {
   }
 
   async function handleGenerate() {
-    if (ingredients.length === 0) {
-      setError('Añade al menos un ingrediente para generar el menú.');
-      return;
-    }
     setError('');
     setLoading(true);
     setWeek(null);
+    setShoppingList([]);
     try {
       const data = await api.menus.weekly(ingredients, filters);
       setWeek(data.week);
+      setShoppingList(data.shoppingList || []);
       setAppliedAllergies(data.appliedAllergies || []);
       setTotalConsidered(data.totalRecipesConsidered || 0);
     } catch (err) {
@@ -68,6 +79,15 @@ export default function MenuPage() {
 
   function toggleExpand(key) {
     setExpandedSlot((prev) => (prev === key ? null : key));
+  }
+
+  function openMealModal(meal) {
+    if (!meal) return;
+    setSelectedRecipe({
+      ...meal.recipe,
+      availableUsed: meal.availableUsed || [],
+      missingIngredients: meal.missingIngredients || [],
+    });
   }
 
   return (
@@ -99,7 +119,7 @@ export default function MenuPage() {
             ))}
           </div>
         ) : (
-          <p className="empty-note">Sin ingredientes. Añade manualmente o visita Despensa primero.</p>
+          <p className="empty-note">Sin ingredientes. Añade aquí lo que tienes o visita <a href="/scan">Escanear</a> primero.</p>
         )}
       </div>
 
@@ -190,9 +210,12 @@ export default function MenuPage() {
                                   ))}
                                 </p>
                               )}
-                              {meal.recipe.instructions && (
-                                <p className="detail-instructions">{meal.recipe.instructions}</p>
-                              )}
+                              <button
+                                className="btn-ver-receta"
+                                onClick={() => openMealModal(meal)}
+                              >
+                                Ver receta completa →
+                              </button>
                             </div>
                           )}
                         </>
@@ -205,7 +228,31 @@ export default function MenuPage() {
               </div>
             ))}
           </div>
+
+          {shoppingList.length > 0 && (
+            <div className="shopping-panel">
+              <div className="shopping-head">
+                <h2>Lista de la compra</h2>
+                <span className="shopping-count">{shoppingList.length}</span>
+              </div>
+              <p className="shopping-desc">
+                Ingredientes que necesitas para el menú semanal y no tienes en casa.
+              </p>
+              <ul className="shopping-list">
+                {shoppingList.map((item) => (
+                  <li key={item} className="shopping-item">
+                    <span className="shopping-dot" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </>
+      )}
+
+      {selectedRecipe && (
+        <RecipeModal recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />
       )}
     </div>
   );

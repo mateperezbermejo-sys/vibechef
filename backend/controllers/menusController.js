@@ -4,11 +4,7 @@ const { generateWeekMenu } = require('../utils/menuUtils');
 
 function weeklyMenu(req, res) {
   try {
-    const { ingredients, filters = [] } = req.body;
-
-    if (!Array.isArray(ingredients) || ingredients.length === 0) {
-      return res.status(400).json({ error: 'Se requiere un array de ingredientes.' });
-    }
+    const { ingredients = [], filters = [] } = req.body;
 
     const db = getDb();
     const normalizedInput = ingredients.map((i) => i.toLowerCase().trim());
@@ -32,6 +28,7 @@ function weeklyMenu(req, res) {
         difficulty: recipe.difficulty,
         tags,
         source: recipe.source || 'seed',
+        image_url: recipe.image_url || null,
         ingredients: recipeIngredients,
         ...scoring,
       };
@@ -45,10 +42,25 @@ function weeklyMenu(req, res) {
 
     const week = generateWeekMenu(filtered);
 
+    // Build shopping list: missing ingredients not already owned, deduplicated
+    const ownedSet = new Set(normalizedInput);
+    const shoppingSet = new Set();
+    for (const { lunch, dinner } of week) {
+      for (const slot of [lunch, dinner]) {
+        if (slot) {
+          for (const ing of slot.missingIngredients || []) {
+            if (!ownedSet.has(ing.toLowerCase())) shoppingSet.add(ing);
+          }
+        }
+      }
+    }
+    const shoppingList = [...shoppingSet].sort();
+
     res.json({
       week,
       appliedAllergies: allergies,
       totalRecipesConsidered: filtered.length,
+      shoppingList,
     });
   } catch (err) {
     console.error(err);

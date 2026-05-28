@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
+import RecipeModal from '../components/RecipeModal';
 import './RecipesPage.css';
 
 export default function RecipesPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { recipes = [], ingredients = [], appliedAllergies = [] } = location.state || {};
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   if (recipes.length === 0 && ingredients.length === 0) {
     navigate('/scan');
@@ -45,10 +48,18 @@ export default function RecipesPage() {
           </p>
           <div className="recipes-grid">
             {recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
+              <RecipeCard
+                key={recipe.id}
+                recipe={recipe}
+                onClick={() => setSelectedRecipe(recipe)}
+              />
             ))}
           </div>
         </>
+      )}
+
+      {selectedRecipe && (
+        <RecipeModal recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />
       )}
     </div>
   );

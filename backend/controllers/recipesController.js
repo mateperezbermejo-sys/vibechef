@@ -36,6 +36,7 @@ function matchRecipes(req, res) {
         difficulty: recipe.difficulty,
         tags,
         source: recipe.source || 'seed',
+        image_url: recipe.image_url || null,
         ingredients: recipeIngredients,
         // Subset-match breakdown
         score,

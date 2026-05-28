@@ -63,6 +63,13 @@ function migrate() {
     if (!err.message.includes('duplicate column name')) throw err;
   }
 
+  // Add image_url column to recipes if it doesn't exist yet
+  try {
+    db.exec(`ALTER TABLE recipes ADD COLUMN image_url TEXT DEFAULT NULL`);
+  } catch (err) {
+    if (!err.message.includes('duplicate column name')) throw err;
+  }
+
   // Weekly menu reference data (10-week template from markdown)
   db.exec(`
     CREATE TABLE IF NOT EXISTS weekly_menus (

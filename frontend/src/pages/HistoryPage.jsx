@@ -1,68 +1,107 @@
 import { useEffect, useState } from 'react';
-import { api } from '../services/api';
+import { Link } from 'react-router-dom';
 import './HistoryPage.css';
 
+const LS_FRIDGE = 'vibechef_fridge';
+const LS_PANTRY = 'vibechef_pantry';
+
+function loadLS(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+}
+
 export default function HistoryPage() {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [fridgeItems, setFridgeItems] = useState([]);
+  const [pantryItems, setPantryItems] = useState([]);
 
   useEffect(() => {
-    api.pantry.history()
-      .then((data) => setHistory(data.history || []))
-      .catch(() => setHistory([]))
-      .finally(() => setLoading(false));
+    setFridgeItems(loadLS(LS_FRIDGE));
+    setPantryItems(loadLS(LS_PANTRY));
   }, []);
 
+  function removeFridge(item) {
+    setFridgeItems((prev) => {
+      const next = prev.filter((i) => i !== item);
+      localStorage.setItem(LS_FRIDGE, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function removePantry(item) {
+    setPantryItems((prev) => {
+      const next = prev.filter((i) => i !== item);
+      localStorage.setItem(LS_PANTRY, JSON.stringify(next));
+      return next;
+    });
+  }
+
   return (
-    <div className="history-page">
-      <div className="history-header">
-        <h1>Tu Despensa</h1>
-        <p className="history-sub">Historial completo de ingredientes detectados y su frecuencia</p>
+    <div className="myfoods-page">
+      <div className="myfoods-header">
+        <h1>Mis alimentos</h1>
+        <p className="myfoods-sub">Todo lo que tienes en casa, listo para cocinar.</p>
       </div>
 
-      {loading ? (
-        <div className="history-loading">
-          <div className="skel-table">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="skel-row-item" />
-            ))}
+      <div className="myfoods-grid">
+        {/* ── Mi nevera ───────────────────────────────────────── */}
+        <section className="myfoods-card">
+          <div className="myfoods-card-head">
+            <div>
+              <h2>Mi nevera</h2>
+              <p className="myfoods-card-desc">Ingredientes confirmados desde tu última exploración de la nevera.</p>
+            </div>
+            {fridgeItems.length > 0 && (
+              <span className="myfoods-badge myfoods-badge--green">{fridgeItems.length}</span>
+            )}
           </div>
-        </div>
-      ) : history.length === 0 ? (
-        <div className="history-empty">
-          <p className="history-empty-title">Sin historial todavía</p>
-          <p>Escanea tus primeros ingredientes para construir tu despensa.</p>
-        </div>
-      ) : (
-        <div className="history-table-wrapper">
-          <table className="history-table">
-            <thead>
-              <tr>
-                <th>Ingrediente</th>
-                <th>Nombre (EN)</th>
-                <th>Veces visto</th>
-                <th>Última vez</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.map((item) => (
-                <tr key={item.name_en}>
-                  <td className="name-es">{item.name_es}</td>
-                  <td className="name-en">{item.name_en}</td>
-                  <td>
-                    <span className="freq-badge">×{item.frequency_count}</span>
-                  </td>
-                  <td className="last-seen">
-                    {new Date(item.last_seen).toLocaleDateString('es-ES', {
-                      day: 'numeric', month: 'short', year: 'numeric',
-                    })}
-                  </td>
-                </tr>
+
+          {fridgeItems.length === 0 ? (
+            <div className="myfoods-empty">
+              <p className="myfoods-empty-title">Tu nevera está vacía</p>
+              <p>Escanea tu nevera para ver tus ingredientes aquí.</p>
+              <Link to="/scan" className="myfoods-cta">Escanear ahora →</Link>
+            </div>
+          ) : (
+            <div className="myfoods-tags">
+              {fridgeItems.map((item) => (
+                <div key={item} className="myfoods-tag myfoods-tag--fridge">
+                  <span>{item}</span>
+                  <button onClick={() => removeFridge(item)} aria-label={`Eliminar ${item}`}>×</button>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
+          )}
+        </section>
+
+        {/* ── Mi despensa ──────────────────────────────────────── */}
+        <section className="myfoods-card">
+          <div className="myfoods-card-head">
+            <div>
+              <h2>Mi despensa</h2>
+              <p className="myfoods-card-desc">Especias, pasta, arroz y todo lo que tienes fuera de la nevera.</p>
+            </div>
+            {pantryItems.length > 0 && (
+              <span className="myfoods-badge myfoods-badge--blue">{pantryItems.length}</span>
+            )}
+          </div>
+
+          {pantryItems.length === 0 ? (
+            <div className="myfoods-empty">
+              <p className="myfoods-empty-title">Tu despensa está vacía</p>
+              <p>Añade alimentos desde la sección Escanear.</p>
+              <Link to="/scan" className="myfoods-cta">Ir a Escanear →</Link>
+            </div>
+          ) : (
+            <div className="myfoods-tags">
+              {pantryItems.map((item) => (
+                <div key={item} className="myfoods-tag myfoods-tag--pantry">
+                  <span>{item}</span>
+                  <button onClick={() => removePantry(item)} aria-label={`Eliminar ${item}`}>×</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

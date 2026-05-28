@@ -1,0 +1,237 @@
+/* ─── Backdrop ────────────────────────────────────────────────── */
+.rmodal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 20, 16, 0.6);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+}
+
+/* ─── Panel ───────────────────────────────────────────────────── */
+.rmodal-panel {
+  background: var(--vc-white);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-lg);
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* ─── Close button ────────────────────────────────────────────── */
+.rmodal-close {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.92);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--vc-ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.rmodal-close:hover {
+  background: var(--vc-white);
+  color: var(--vc-tomato);
+}
+
+/* ─── Image / placeholder ─────────────────────────────────────── */
+.rmodal-img {
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+.rmodal-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.rmodal-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f8f1e8 0%, #f0e4d0 45%, #e6cfb0 100%);
+}
+
+/* ─── Content area (below image) ──────────────────────────────── */
+.rmodal-content {
+  padding: var(--sp-6) var(--sp-6) var(--sp-8);
+}
+
+/* ─── Head ────────────────────────────────────────────────────── */
+.rmodal-head {
+  margin-bottom: var(--sp-5);
+}
+
+.rmodal-title {
+  font-family: var(--vc-font-head);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--vc-ink);
+  margin: 0 0 var(--sp-2);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  /* avoid overlap with close button when image is absent */
+  padding-right: var(--sp-8);
+}
+
+.rmodal-meta {
+  display: flex;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.rmodal-meta-item {
+  font-size: 0.85rem;
+  color: var(--vc-muted);
+}
+
+/* ─── Section ─────────────────────────────────────────────────── */
+.rmodal-section {
+  margin-bottom: var(--sp-6);
+}
+
+.rmodal-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--vc-muted);
+  margin: 0 0 var(--sp-3);
+}
+
+/* ─── Ingredient list ─────────────────────────────────────────── */
+.rmodal-ing-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.rmodal-ing-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.9rem;
+}
+
+.rmodal-ing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rmodal-ing--have { color: var(--vc-ink-soft); }
+.rmodal-ing--have .rmodal-ing-dot { background: var(--vc-green); }
+
+.rmodal-ing--miss { color: var(--vc-muted); }
+.rmodal-ing--miss .rmodal-ing-dot { background: var(--vc-tomato); }
+
+.rmodal-ing-label {
+  font-size: 0.68rem;
+  color: var(--vc-tomato);
+  background: var(--vc-tomato-pale);
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-left: auto;
+}
+
+/* ─── Steps ───────────────────────────────────────────────────── */
+.rmodal-steps {
+  padding: 0;
+  margin: 0;
+  counter-reset: step;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.rmodal-step {
+  display: flex;
+  gap: var(--sp-3);
+  font-size: 0.9rem;
+  color: var(--vc-ink-soft);
+  line-height: 1.6;
+  counter-increment: step;
+}
+
+.rmodal-step::before {
+  content: counter(step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--vc-green-pale);
+  color: var(--vc-green-deep);
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+/* ─── Raw instructions fallback ───────────────────────────────── */
+.rmodal-instructions {
+  font-size: 0.9rem;
+  color: var(--vc-ink-soft);
+  line-height: 1.75;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+/* ─── Tags ────────────────────────────────────────────────────── */
+.rmodal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--vc-border-light);
+}
+
+.rmodal-tag {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  background: var(--vc-warm-dark);
+  color: var(--vc-muted);
+  border-radius: var(--r-pill);
+}
+
+/* ─── Scroll handle ───────────────────────────────────────────── */
+.rmodal-panel { scrollbar-gutter: stable; }
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .rmodal-backdrop { padding: var(--sp-2); align-items: flex-end; }
+  .rmodal-panel {
+    max-width: 100%;
+    max-height: 96vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .rmodal-img { height: 170px; }
+  .rmodal-content { padding: var(--sp-5) var(--sp-5) var(--sp-8); }
+}

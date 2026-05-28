@@ -19,61 +19,98 @@ function normalize(name) {
   return CANONICAL_MAP[lower] || lower;
 }
 
+const LS_FRIDGE = 'vibechef_fridge';
+const LS_PANTRY = 'vibechef_pantry';
+
+function loadLS(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+}
+
+const FILTER_OPTIONS = [
+  { key: 'vegetarian',   label: 'Vegetariano' },
+  { key: 'vegan',        label: 'Vegano' },
+  { key: 'quick',        label: 'Rápido' },
+  { key: 'high-protein', label: 'Alto en proteína' },
+  { key: 'healthy',      label: 'Saludable' },
+];
+
 export default function ScanPage() {
   const location = useLocation();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
 
-  const [input, setInput]           = useState('');
-  const [ingredients, setIngredients] = useState([]);
-  const [filters, setFilters]       = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState('');
+  // "Mi nevera" — items from scanner or typed manually
+  const [fridgeItems, setFridgeItems] = useState([]);
+  const [fridgeInput, setFridgeInput] = useState('');
 
-  // Allergies state
-  const [allergies, setAllergies]         = useState([]);
-  const [allergyInput, setAllergyInput]   = useState('');
+  // "Mi despensa" — manually added pantry items, persisted in localStorage
+  const [pantryItems, setPantryItems] = useState([]);
+  const [pantryInput, setPantryInput] = useState('');
+
+  const [filters, setFilters]               = useState([]);
+  const [loading, setLoading]               = useState(false);
+  const [error, setError]                   = useState('');
+  const [allergies, setAllergies]           = useState([]);
+  const [allergyInput, setAllergyInput]     = useState('');
   const [allergiesLoading, setAllergiesLoading] = useState(false);
 
   useEffect(() => {
-    if (location.state?.preloaded) setIngredients(location.state.preloaded);
-    // Load user allergies from backend
+    if (location.state?.preloaded) setFridgeItems(location.state.preloaded);
+    setPantryItems(loadLS(LS_PANTRY));
     api.allergies.get()
       .then((data) => setAllergies(data.allergies || []))
       .catch(() => {});
   }, []);
 
-  function addIngredient(nameOrNames) {
+  // Persist pantry whenever it changes
+  useEffect(() => {
+    localStorage.setItem(LS_PANTRY, JSON.stringify(pantryItems));
+  }, [pantryItems]);
+
+  // ── Mi nevera ─────────────────────────────────────────────────
+
+  function addFridgeItem(nameOrNames) {
     const names = Array.isArray(nameOrNames) ? nameOrNames : [nameOrNames];
-    setIngredients((prev) => {
+    setFridgeItems((prev) => {
       const next = [...prev];
       for (const raw of names) {
-        const canonical = normalize(raw.trim());
-        if (canonical && !next.includes(canonical)) next.push(canonical);
+        const c = normalize(raw.trim());
+        if (c && !next.includes(c)) next.push(c);
       }
       return next;
     });
-    if (!Array.isArray(nameOrNames)) setInput('');
+    if (!Array.isArray(nameOrNames)) setFridgeInput('');
   }
 
-  function removeIngredient(name) {
-    setIngredients((prev) => prev.filter((i) => i !== name));
+  function removeFridgeItem(name) {
+    setFridgeItems((prev) => prev.filter((i) => i !== name));
   }
 
-  function handleKeyDown(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const raw = input.trim();
-      if (raw) addIngredient(raw);
-    }
+  function handleFridgeKeyDown(e) {
+    if (e.key === 'Enter') { e.preventDefault(); const r = fridgeInput.trim(); if (r) addFridgeItem(r); }
   }
+
+  // ── Mi despensa ───────────────────────────────────────────────
+
+  function addPantryItem() {
+    const name = normalize(pantryInput.trim());
+    if (!name || pantryItems.includes(name)) { setPantryInput(''); return; }
+    setPantryItems((prev) => [...prev, name]);
+    setPantryInput('');
+  }
+
+  function removePantryItem(name) {
+    setPantryItems((prev) => prev.filter((i) => i !== name));
+  }
+
+  function handlePantryKeyDown(e) {
+    if (e.key === 'Enter') { e.preventDefault(); addPantryItem(); }
+  }
+
+  // ── Alergias ──────────────────────────────────────────────────
 
   function toggleFilter(f) {
-    setFilters((prev) =>
-      prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]
-    );
+    setFilters((prev) => prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]);
   }
-
-  // ── Allergy handlers ──────────────────────────────────────────────────────
 
   async function handleAddAllergy() {
     const name = allergyInput.trim().toLowerCase();
@@ -103,20 +140,22 @@ export default function ScanPage() {
     if (e.key === 'Enter') { e.preventDefault(); handleAddAllergy(); }
   }
 
-  // ── Recipe search ─────────────────────────────────────────────────────────
+  // ── Buscar recetas ────────────────────────────────────────────
 
   async function handleConfirm() {
-    if (ingredients.length === 0) {
-      setError('Añade al menos un ingrediente.');
+    const allIngredients = [...new Set([...fridgeItems, ...pantryItems])];
+    if (allIngredients.length === 0) {
+      setError('Añade al menos un ingrediente para buscar recetas.');
       return;
     }
     setError('');
     setLoading(true);
     try {
-      await api.pantry.log(ingredients);
-      const data = await api.recipes.match(ingredients, filters);
+      if (fridgeItems.length > 0) await api.pantry.log(fridgeItems);
+      localStorage.setItem(LS_FRIDGE, JSON.stringify(fridgeItems));
+      const data = await api.recipes.match(allIngredients, filters);
       navigate('/recipes', {
-        state: { recipes: data.recipes, ingredients, appliedAllergies: data.appliedAllergies },
+        state: { recipes: data.recipes, ingredients: allIngredients, appliedAllergies: data.appliedAllergies },
       });
     } catch (err) {
       setError(err.message);
@@ -125,120 +164,165 @@ export default function ScanPage() {
     }
   }
 
-  const FILTER_OPTIONS = [
-    { key: 'vegetarian',   label: 'Vegetariano' },
-    { key: 'vegan',        label: 'Vegano' },
-    { key: 'quick',        label: 'Rápido' },
-    { key: 'high-protein', label: 'Alto en proteína' },
-    { key: 'healthy',      label: 'Saludable' },
-  ];
+  const totalItems = fridgeItems.length + pantryItems.length;
 
   return (
     <div className="scan-page">
       <div className="scan-header">
-        <h1>Confirma tus ingredientes</h1>
-        <p>Detecta con la cámara o añade manualmente los ingredientes disponibles</p>
+        <h1>Escanea tu nevera</h1>
+        <p>Haz una foto, revisa lo que tienes y completa tu despensa en segundos.</p>
       </div>
 
-      <VisionScanner onDetected={addIngredient} />
+      <div className="scan-layout">
+        {/* ── Columna izquierda: escáner + Mi nevera ────────────── */}
+        <div className="scan-main">
+          <VisionScanner onDetected={addFridgeItem} />
 
-      {/* Manual ingredient input */}
-      <div className="scan-card">
-        <h2>Ingredientes confirmados</h2>
-        <div className="input-row">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="ej: tomato, egg, pasta..."
-          />
-          <button onClick={() => { const raw = input.trim(); if (raw) addIngredient(raw); }} className="btn-add">
-            Añadir
+          <div className="scan-card">
+            <h2>Mi nevera</h2>
+            <p className="scan-card-desc">Ingredientes que has detectado o añadido de la nevera.</p>
+            <div className="input-row">
+              <input
+                type="text"
+                value={fridgeInput}
+                onChange={(e) => setFridgeInput(e.target.value)}
+                onKeyDown={handleFridgeKeyDown}
+                placeholder="ej: tomate, huevo, pollo..."
+              />
+              <button
+                onClick={() => { const r = fridgeInput.trim(); if (r) addFridgeItem(r); }}
+                className="btn-add"
+              >
+                Añadir
+              </button>
+            </div>
+            {fridgeItems.length === 0 ? (
+              <div className="empty-ingredients">
+                <p>Usa el escáner arriba o escribe directamente lo que tienes en la nevera.</p>
+              </div>
+            ) : (
+              <div className="ingredient-tags">
+                {fridgeItems.map((ing) => (
+                  <div key={ing} className="ingredient-tag">
+                    <span>{ing}</span>
+                    <button onClick={() => removeFridgeItem(ing)} aria-label={`Eliminar ${ing}`}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {fridgeItems.length > 0 && (
+              <div className="ingredient-count">{fridgeItems.length} en la nevera</div>
+            )}
+          </div>
+
+          <div className="scan-card allergy-card">
+            <h2>
+              Lo que prefieres evitar
+              {allergies.length > 0 && (
+                <span className="allergy-count">{allergies.length} activa{allergies.length !== 1 ? 's' : ''}</span>
+              )}
+            </h2>
+            <p className="allergy-hint">Ajustaremos tus recetas para que no aparezcan estos ingredientes.</p>
+            <div className="input-row">
+              <input
+                type="text"
+                value={allergyInput}
+                onChange={(e) => setAllergyInput(e.target.value)}
+                onKeyDown={handleAllergyKeyDown}
+                placeholder="ej: gluten, frutos secos, lactosa..."
+              />
+              <button onClick={handleAddAllergy} className="btn-add" disabled={allergiesLoading || !allergyInput.trim()}>
+                {allergiesLoading ? '...' : 'Añadir'}
+              </button>
+            </div>
+            {allergies.length === 0 ? (
+              <p className="allergy-empty">Sin restricciones activas.</p>
+            ) : (
+              <div className="ingredient-tags">
+                {allergies.map((a) => (
+                  <div key={a} className="ingredient-tag allergy-tag">
+                    <span>{a}</span>
+                    <button onClick={() => handleRemoveAllergy(a)} aria-label={`Eliminar restricción ${a}`}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="scan-card">
+            <h2>Tipo de receta</h2>
+            <div className="filter-grid">
+              {FILTER_OPTIONS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  className={`filter-btn ${filters.includes(key) ? 'active' : ''}`}
+                  onClick={() => toggleFilter(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {error && <p className="scan-error">{error}</p>}
+
+          <button
+            className="btn-confirm"
+            onClick={handleConfirm}
+            disabled={loading || totalItems === 0}
+          >
+            {loading
+              ? 'Buscando recetas...'
+              : `Ver recetas · ${totalItems} ingrediente${totalItems !== 1 ? 's' : ''}`}
           </button>
         </div>
 
-        {ingredients.length === 0 ? (
-          <div className="empty-ingredients">
-            <p>Usa el Vision Agent para detectar ingredientes o escríbelos directamente.</p>
-          </div>
-        ) : (
-          <div className="ingredient-tags">
-            {ingredients.map((ing) => (
-              <div key={ing} className="ingredient-tag">
-                <span>{ing}</span>
-                <button onClick={() => removeIngredient(ing)} aria-label={`Eliminar ${ing}`}>×</button>
+        {/* ── Columna derecha: Mi despensa ───────────────────────── */}
+        <aside className="scan-aside">
+          <div className="pantry-panel">
+            <div className="pantry-panel-head">
+              <h2>Mi despensa</h2>
+              {pantryItems.length > 0 && (
+                <span className="pantry-count">{pantryItems.length}</span>
+              )}
+            </div>
+            <p className="pantry-desc">
+              Añade aquí lo que tienes fuera de la nevera: especias, pasta, arroz, conservas...
+              Se guardará entre sesiones.
+            </p>
+            <div className="input-row">
+              <input
+                type="text"
+                value={pantryInput}
+                onChange={(e) => setPantryInput(e.target.value)}
+                onKeyDown={handlePantryKeyDown}
+                placeholder="ej: arroz, aceite, sal..."
+              />
+              <button onClick={addPantryItem} className="btn-add" disabled={!pantryInput.trim()}>
+                Añadir
+              </button>
+            </div>
+            {pantryItems.length === 0 ? (
+              <div className="pantry-empty">
+                <p>Tu despensa está vacía.</p>
+                <p className="pantry-empty-sub">Los alimentos que añadas aquí se guardarán entre sesiones.</p>
               </div>
-            ))}
-          </div>
-        )}
-        <div className="ingredient-count">
-          {ingredients.length} ingrediente{ingredients.length !== 1 ? 's' : ''}
-        </div>
-      </div>
-
-      {/* Allergies / restrictions */}
-      <div className="scan-card allergy-card">
-        <h2>
-          Alergias y restricciones
-          {allergies.length > 0 && <span className="allergy-count">{allergies.length} activa{allergies.length !== 1 ? 's' : ''}</span>}
-        </h2>
-        <p className="allergy-hint">El sistema excluirá automáticamente recetas con estos ingredientes.</p>
-
-        <div className="input-row">
-          <input
-            type="text"
-            value={allergyInput}
-            onChange={(e) => setAllergyInput(e.target.value)}
-            onKeyDown={handleAllergyKeyDown}
-            placeholder="ej: gluten, peanut, milk..."
-          />
-          <button onClick={handleAddAllergy} className="btn-add" disabled={allergiesLoading || !allergyInput.trim()}>
-            {allergiesLoading ? '...' : 'Añadir'}
-          </button>
-        </div>
-
-        {allergies.length === 0 ? (
-          <p className="allergy-empty">Sin restricciones activas.</p>
-        ) : (
-          <div className="ingredient-tags">
-            {allergies.map((a) => (
-              <div key={a} className="ingredient-tag allergy-tag">
-                <span>{a}</span>
-                <button onClick={() => handleRemoveAllergy(a)} aria-label={`Eliminar alergia ${a}`}>×</button>
+            ) : (
+              <div className="ingredient-tags">
+                {pantryItems.map((item) => (
+                  <div key={item} className="ingredient-tag pantry-tag">
+                    <span>{item}</span>
+                    <button onClick={() => removePantryItem(item)} aria-label={`Eliminar ${item}`}>×</button>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+            {pantryItems.length > 0 && (
+              <div className="ingredient-count">{pantryItems.length} en la despensa</div>
+            )}
           </div>
-        )}
+        </aside>
       </div>
-
-      {/* Filters */}
-      <div className="scan-card">
-        <h2>Filtros</h2>
-        <div className="filter-grid">
-          {FILTER_OPTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              className={`filter-btn ${filters.includes(key) ? 'active' : ''}`}
-              onClick={() => toggleFilter(key)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {error && <p className="scan-error">{error}</p>}
-
-      <button
-        className="btn-confirm"
-        onClick={handleConfirm}
-        disabled={loading || ingredients.length === 0}
-      >
-        {loading
-          ? 'Buscando recetas...'
-          : `Buscar recetas · ${ingredients.length} ingrediente${ingredients.length !== 1 ? 's' : ''}`}
-      </button>
     </div>
   );
 }

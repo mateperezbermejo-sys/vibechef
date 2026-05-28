@@ -7,7 +7,6 @@ import DashboardPage from './pages/DashboardPage';
 import ScanPage from './pages/ScanPage';
 import RecipesPage from './pages/RecipesPage';
 import HistoryPage from './pages/HistoryPage';
-import SettingsPage from './pages/SettingsPage';
 import MenuPage from './pages/MenuPage';
 
 function PrivateRoute({ children }) {
@@ -32,7 +31,6 @@ function AppRoutes() {
           <Route path="/scan" element={<PrivateRoute><ScanPage /></PrivateRoute>} />
           <Route path="/recipes" element={<PrivateRoute><RecipesPage /></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
-          <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
           <Route path="/menu" element={<PrivateRoute><MenuPage /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -1,42 +1,40 @@
-import { useState } from 'react';
 import './RecipeCard.css';
 
 const DIFFICULTY_ES    = { easy: 'Fácil', medium: 'Media', hard: 'Difícil' };
 const DIFFICULTY_CLASS = { easy: 'easy', medium: 'medium', hard: 'hard' };
-const SOURCE_LABELS    = { pdf: 'PDF', markdown: 'Recetario', seed: null };
 
-export default function RecipeCard({ recipe }) {
-  const [expanded, setExpanded] = useState(false);
-
+export default function RecipeCard({ recipe, onClick }) {
   const {
-    name, instructions, prep_time, difficulty, tags = [], source,
-    score, matchCount, missingCount,
-    availableUsed = [], missingIngredients = [], substitutions = {},
+    name, prep_time, difficulty, tags = [], score,
+    matchCount = 0, missingCount = 0, image_url,
   } = recipe;
 
   const total    = matchCount + missingCount;
   const matchPct = total > 0 ? Math.round((matchCount / total) * 100) : 0;
   const isHigh   = score >= 20;
-  const srcLabel = SOURCE_LABELS[source];
 
   return (
-    <article className={`rcard ${isHigh ? 'rcard--high' : ''}`}>
-      {/* Match bar */}
-      <div
-        className="rcard-bar"
-        style={{ '--pct': `${matchPct}%` }}
-        aria-label={`Compatibilidad: ${matchPct}%`}
-      />
+    <article
+      className={`rcard ${isHigh ? 'rcard--high' : ''}`}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
+    >
+      {/* Recipe image or category placeholder */}
+      <div className="rcard-img">
+        {image_url ? (
+          <img src={image_url} alt={name} loading="lazy" />
+        ) : (
+          <div className="rcard-img-placeholder" aria-hidden="true" />
+        )}
+      </div>
+
+      <div className="rcard-bar" style={{ '--pct': `${matchPct}%` }} />
 
       <div className="rcard-body">
-        {/* Badges row */}
         <div className="rcard-badges">
-          {srcLabel && (
-            <span className={`rcard-badge rcard-badge--src rcard-badge--src-${source}`}>
-              {srcLabel}
-            </span>
-          )}
-          <span className={`rcard-badge rcard-badge--diff rcard-badge--${DIFFICULTY_CLASS[difficulty] || 'easy'}`}>
+          <span className={`rcard-badge rcard-badge--${DIFFICULTY_CLASS[difficulty] || 'easy'}`}>
             {DIFFICULTY_ES[difficulty] || difficulty}
           </span>
           {prep_time && (
@@ -45,74 +43,29 @@ export default function RecipeCard({ recipe }) {
           {isHigh && <span className="rcard-badge rcard-badge--match">Gran encaje</span>}
         </div>
 
-        {/* Name */}
         <h3 className="rcard-name">{name}</h3>
 
-        {/* Ingredient breakdown */}
-        <div className="rcard-ingredients">
-          {availableUsed.length > 0 && (
-            <div className="rcard-ing-row">
-              <span className="rcard-ing-lbl rcard-ing-lbl--have">Tienes</span>
-              <div className="rcard-chips">
-                {availableUsed.map((i) => (
-                  <span key={i} className="rcard-chip rcard-chip--have">{i}</span>
-                ))}
-              </div>
-            </div>
+        <p className="rcard-miss-line">
+          {missingCount === 0 ? (
+            <span className="rcard-miss-zero">Tienes todo</span>
+          ) : (
+            <>
+              <span className="rcard-miss-count">{missingCount}</span>
+              {' '}ingrediente{missingCount !== 1 ? 's' : ''} por comprar
+            </>
           )}
-
-          {missingIngredients.length > 0 && (
-            <div className="rcard-ing-row">
-              <span className="rcard-ing-lbl rcard-ing-lbl--miss">Faltan</span>
-              <div className="rcard-chips">
-                {missingIngredients.map((i) => (
-                  <span key={i} className="rcard-chip rcard-chip--miss">
-                    {i}
-                    {substitutions[i] && (
-                      <span className="rcard-sub"> → {substitutions[i][0]}</span>
-                    )}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Score summary */}
-        <p className="rcard-score-line">
-          <strong>{matchCount}</strong> de {total} ingredientes disponibles
         </p>
 
-        {/* Tags */}
-        {tags.length > 0 && (
-          <div className="rcard-tags">
-            {tags.map((t) => (
-              <span key={t} className="rcard-chip rcard-chip--tag">{t}</span>
-            ))}
-          </div>
-        )}
-
-        {/* Expand instructions */}
-        {instructions && (
-          <>
-            <button
-              className="rcard-toggle"
-              onClick={() => setExpanded((e) => !e)}
-              aria-expanded={expanded}
-            >
-              {expanded ? 'Ocultar preparación' : 'Ver preparación'}
-              <span className="rcard-toggle-arrow" aria-hidden="true">
-                {expanded ? '▲' : '▼'}
-              </span>
-            </button>
-
-            {expanded && (
-              <div className="rcard-instructions">
-                <p>{instructions}</p>
-              </div>
-            )}
-          </>
-        )}
+        <div className="rcard-footer">
+          {tags.length > 0 && (
+            <div className="rcard-tags">
+              {tags.slice(0, 3).map((t) => (
+                <span key={t} className="rcard-tag">{t}</span>
+              ))}
+            </div>
+          )}
+          <span className="rcard-cta">Ver receta →</span>
+        </div>
       </div>
     </article>
   );

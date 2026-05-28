@@ -6,9 +6,8 @@ import './Navbar.css';
 const NAV_LINKS = [
   { to: '/',        label: 'Inicio' },
   { to: '/scan',    label: 'Escanear' },
-  { to: '/history', label: 'Despensa' },
+  { to: '/history', label: 'Mis alimentos' },
   { to: '/menu',    label: 'Menú' },
-  { to: '/settings',label: 'Importar' },
 ];
 
 export default function Navbar() {

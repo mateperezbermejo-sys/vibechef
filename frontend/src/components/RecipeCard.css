@@ -5,13 +5,36 @@
   border-radius: var(--r-lg);
   overflow: hidden;
   box-shadow: var(--sh-sm);
+  cursor: pointer;
   transition: box-shadow var(--t-normal), transform var(--t-normal);
 }
 .rcard:hover {
   box-shadow: var(--sh-md);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 .rcard--high { border-left: 3px solid var(--vc-green); }
+
+/* ─── Image / placeholder ─────────────────────────────────────── */
+.rcard-img {
+  width: 100%;
+  height: 156px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.rcard-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.rcard:hover .rcard-img img { transform: scale(1.04); }
+
+.rcard-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f8f1e8 0%, #f0e4d0 45%, #e8d4b8 100%);
+}
 
 /* ─── Match bar ──────────────────────────────────────────────── */
 .rcard-bar {
@@ -31,7 +54,7 @@
 }
 
 /* ─── Body ───────────────────────────────────────────────────── */
-.rcard-body { padding: var(--sp-5) var(--sp-6); }
+.rcard-body { padding: var(--sp-4) var(--sp-5); }
 
 /* ─── Badges ─────────────────────────────────────────────────── */
 .rcard-badges {
@@ -53,122 +76,62 @@
   line-height: 1.4;
 }
 
-/* Source badges */
-.rcard-badge--src-pdf      { background: #EEF2FF; color: #4F46E5; }
-.rcard-badge--src-markdown { background: var(--vc-green-pale); color: var(--vc-green-deep); }
-
-/* Difficulty badges */
 .rcard-badge--easy   { background: var(--vc-green-pale);   color: var(--vc-green-deep); }
 .rcard-badge--medium { background: #FEF9C3; color: #92400E; }
 .rcard-badge--hard   { background: var(--vc-tomato-pale);  color: var(--vc-tomato); }
-
-/* Time badge */
-.rcard-badge--time { background: var(--vc-warm-dark); color: var(--vc-muted); }
-
-/* High-match badge */
-.rcard-badge--match { background: var(--vc-green); color: var(--vc-white); }
+.rcard-badge--time   { background: var(--vc-warm-dark);    color: var(--vc-muted); }
+.rcard-badge--match  { background: var(--vc-green);        color: var(--vc-white); }
 
 /* ─── Name ───────────────────────────────────────────────────── */
 .rcard-name {
   font-family: var(--vc-font-head);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--vc-ink);
-  margin: 0 0 var(--sp-4);
+  margin: 0 0 var(--sp-2);
   letter-spacing: -0.01em;
   line-height: 1.3;
 }
 
-/* ─── Ingredient breakdown ───────────────────────────────────── */
-.rcard-ingredients {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-3);
-}
-
-.rcard-ing-row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-3);
-}
-
-.rcard-ing-lbl {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding-top: 4px;
-  flex-shrink: 0;
-  width: 42px;
-}
-.rcard-ing-lbl--have { color: var(--vc-green); }
-.rcard-ing-lbl--miss { color: var(--vc-tomato); }
-
-.rcard-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
-
-.rcard-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 0.22rem 0.6rem;
-  border-radius: var(--r-pill);
-  font-size: 0.78rem;
-  font-weight: 500;
-}
-.rcard-chip--have { background: var(--vc-green-pale);  color: var(--vc-green-deep); }
-.rcard-chip--miss { background: var(--vc-tomato-pale); color: var(--vc-tomato); }
-.rcard-chip--tag  { background: var(--vc-warm-dark);   color: var(--vc-muted); }
-
-.rcard-sub {
-  font-size: 0.7rem;
-  font-style: italic;
-  color: var(--vc-muted);
-}
-
-/* ─── Score line ─────────────────────────────────────────────── */
-.rcard-score-line {
+/* ─── Missing line ───────────────────────────────────────────── */
+.rcard-miss-line {
   font-size: 0.82rem;
   color: var(--vc-muted);
-  margin: 0 0 var(--sp-3);
+  margin: 0 0 var(--sp-4);
 }
-.rcard-score-line strong { color: var(--vc-ink-soft); }
+.rcard-miss-count { color: var(--vc-tomato); font-weight: 700; }
+.rcard-miss-zero  { color: var(--vc-green);  font-weight: 600; }
 
-/* ─── Tags ───────────────────────────────────────────────────── */
+/* ─── Footer ─────────────────────────────────────────────────── */
+.rcard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
 .rcard-tags {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
-  margin-bottom: var(--sp-4);
 }
 
-/* ─── Expand toggle ──────────────────────────────────────────── */
-.rcard-toggle {
+.rcard-tag {
   display: inline-flex;
   align-items: center;
-  gap: var(--sp-2);
-  background: none;
-  border: none;
-  font-size: 0.83rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--r-pill);
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: var(--vc-warm-dark);
+  color: var(--vc-muted);
+}
+
+/* ─── CTA ────────────────────────────────────────────────────── */
+.rcard-cta {
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--vc-green);
-  cursor: pointer;
-  padding: 0;
-  transition: color var(--t-fast);
-}
-.rcard-toggle:hover { color: var(--vc-green-deep); }
-.rcard-toggle-arrow { font-size: 0.62rem; }
-
-/* ─── Instructions ───────────────────────────────────────────── */
-.rcard-instructions {
-  margin-top: var(--sp-4);
-  padding-top: var(--sp-4);
-  border-top: 1px solid var(--vc-border-light);
-}
-.rcard-instructions p {
-  margin: 0;
-  font-size: 0.87rem;
-  color: var(--vc-ink-soft);
-  line-height: 1.75;
-  white-space: pre-wrap;
+  white-space: nowrap;
+  flex-shrink: 0;
 }

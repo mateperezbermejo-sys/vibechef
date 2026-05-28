@@ -124,17 +124,96 @@
   position: absolute; inset: 0;
   width: 100%; height: 100%; pointer-events: none;
 }
+.scanner-overlay--draw {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+/* ─── Paste hint ─────────────────────────────────────────────── */
+.paste-hint {
+  font-size: 0.78rem;
+  color: var(--vc-muted-light);
+  margin: calc(-1 * var(--sp-1)) 0 var(--sp-3);
+}
+
+/* ─── Action row (analyze + draw-mode) ───────────────────────── */
+.scanner-actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
 
 /* ─── Analyze button ─────────────────────────────────────────── */
 .btn-analyze {
-  width: 100%; padding: 0.75rem;
+  flex: 1;
+  padding: 0.75rem;
   background: #1a6ebd; color: var(--vc-white);
   border: none; border-radius: var(--r-md);
   font-size: 0.92rem; font-weight: 600; cursor: pointer;
-  margin-bottom: var(--sp-4); transition: background var(--t-fast);
+  transition: background var(--t-fast);
 }
 .btn-analyze:hover:not(:disabled) { background: #155ca0; }
 .btn-analyze:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ─── Draw-mode toggle ───────────────────────────────────────── */
+.btn-draw-mode {
+  padding: 0.75rem 1rem;
+  background: none;
+  border: 1.5px solid var(--vc-border);
+  border-radius: var(--r-md);
+  font-size: 0.88rem; font-weight: 600;
+  color: var(--vc-ink-soft); cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--t-fast);
+}
+.btn-draw-mode:hover:not(:disabled) { border-color: #1a6ebd; color: #1a6ebd; }
+.btn-draw-mode.active { background: #1a6ebd; border-color: #1a6ebd; color: var(--vc-white); }
+.btn-draw-mode:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ─── Manual name form ───────────────────────────────────────── */
+.manual-name-form {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-3);
+}
+.manual-name-prompt {
+  font-size: 0.82rem; font-weight: 600;
+  color: #1e40af; margin: 0 0 var(--sp-2);
+}
+.manual-name-row {
+  display: flex; gap: var(--sp-2);
+  align-items: center; flex-wrap: wrap;
+}
+.manual-name-input {
+  flex: 1; min-width: 160px;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #93C5FD; border-radius: var(--r-md);
+  font-size: 0.88rem; outline: none; color: var(--vc-ink);
+  background: var(--vc-white);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.manual-name-input:focus {
+  border-color: #1a6ebd;
+  box-shadow: 0 0 0 3px rgba(26,110,189,0.15);
+}
+.btn-confirm-manual {
+  padding: 0.5rem 1rem;
+  background: #1a6ebd; color: var(--vc-white);
+  border: none; border-radius: var(--r-md);
+  font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  transition: background var(--t-fast);
+}
+.btn-confirm-manual:hover:not(:disabled) { background: #155ca0; }
+.btn-confirm-manual:disabled { opacity: .5; cursor: not-allowed; }
+.btn-cancel-manual {
+  padding: 0.5rem 0.8rem;
+  background: none; border: 1px solid var(--vc-border); border-radius: var(--r-md);
+  font-size: 0.85rem; color: var(--vc-muted); cursor: pointer;
+  transition: all var(--t-fast);
+}
+.btn-cancel-manual:hover { border-color: var(--vc-muted); color: var(--vc-ink-soft); }
 
 /* ─── Detections box ─────────────────────────────────────────── */
 .detections-box {
@@ -196,6 +275,21 @@
   color: var(--vc-muted);
 }
 .btn-det-edit:hover { opacity: 1; color: var(--vc-ink); }
+
+.btn-det-delete {
+  background: none; border: none; cursor: pointer;
+  font-size: 1.1rem; line-height: 1; padding: 0 0.25rem;
+  color: var(--vc-muted-light);
+  transition: color var(--t-fast);
+}
+.btn-det-delete:hover { color: var(--vc-tomato); }
+
+.det-confidence-badge.manual {
+  background: #EFF6FF; color: #1a6ebd;
+}
+.detection-item.manual-item {
+  border-color: #BFDBFE; background: #F8FBFF;
+}
 
 /* ─── Inline edit form ───────────────────────────────────────── */
 .det-edit-row {

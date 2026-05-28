@@ -1,5 +1,5 @@
 .scan-page {
-  max-width: 640px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: var(--sp-8) var(--sp-6);
 }
@@ -21,7 +21,26 @@
   font-size: 0.92rem;
 }
 
-/* Cards */
+/* ─── Two-column layout ──────────────────────────────────────── */
+.scan-layout {
+  display: flex;
+  gap: var(--sp-6);
+  align-items: flex-start;
+}
+
+.scan-main {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.scan-aside {
+  flex: 0 0 300px;
+  width: 300px;
+  position: sticky;
+  top: calc(var(--navbar-h) + var(--sp-4));
+}
+
+/* ─── Cards ──────────────────────────────────────────────────── */
 .scan-card {
   background: var(--vc-white);
   border: 1px solid var(--vc-border-light);
@@ -32,7 +51,7 @@
 }
 
 .scan-card h2 {
-  margin: 0 0 var(--sp-4);
+  margin: 0 0 var(--sp-1);
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--vc-ink-soft);
@@ -41,7 +60,14 @@
   font-family: var(--vc-font-body);
 }
 
-/* Input row */
+.scan-card-desc {
+  font-size: 0.82rem;
+  color: var(--vc-muted);
+  margin: 0 0 var(--sp-4);
+  line-height: 1.5;
+}
+
+/* ─── Input row ──────────────────────────────────────────────── */
 .input-row {
   display: flex;
   gap: var(--sp-2);
@@ -80,7 +106,7 @@
 .btn-add:hover { background: var(--vc-green-deep); }
 .btn-add:disabled { opacity: .45; cursor: not-allowed; }
 
-/* Ingredient tags */
+/* ─── Ingredient tags ────────────────────────────────────────── */
 .ingredient-tags {
   display: flex;
   flex-wrap: wrap;
@@ -125,7 +151,7 @@
   margin-top: var(--sp-1);
 }
 
-/* Allergy card */
+/* ─── Allergy card ───────────────────────────────────────────── */
 .allergy-card h2 { display: flex; align-items: center; gap: var(--sp-2); }
 
 .allergy-count {
@@ -142,7 +168,7 @@
 .allergy-hint {
   font-size: 0.82rem;
   color: var(--vc-muted);
-  margin: calc(-1 * var(--sp-3)) 0 var(--sp-4);
+  margin: 0 0 var(--sp-4);
 }
 
 .allergy-empty { font-size: 0.85rem; color: var(--vc-muted-light); margin: 0; }
@@ -155,7 +181,7 @@
 .allergy-tag button { color: var(--vc-tomato) !important; }
 .allergy-tag button:hover { color: var(--vc-tomato-hover) !important; }
 
-/* Filters */
+/* ─── Filters ────────────────────────────────────────────────── */
 .filter-grid { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 
 .filter-btn {
@@ -176,14 +202,77 @@
   color: var(--vc-white);
 }
 
-/* Error */
+/* ─── Pantry panel (Mi despensa) ─────────────────────────────── */
+.pantry-panel {
+  background: var(--vc-white);
+  border: 1px solid var(--vc-border-light);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5) var(--sp-5);
+  box-shadow: var(--sh-sm);
+}
+
+.pantry-panel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.pantry-panel-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-family: var(--vc-font-head);
+  font-weight: 700;
+  color: var(--vc-ink);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.pantry-count {
+  background: var(--vc-green-pale);
+  color: var(--vc-green-deep);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--r-pill);
+}
+
+.pantry-desc {
+  font-size: 0.82rem;
+  color: var(--vc-muted);
+  margin: 0 0 var(--sp-4);
+  line-height: 1.6;
+}
+
+.pantry-empty {
+  padding: var(--sp-4) 0 var(--sp-2);
+  color: var(--vc-muted-light);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.pantry-empty-sub {
+  font-size: 0.78rem;
+  color: var(--vc-muted-light);
+  margin-top: var(--sp-1);
+}
+
+.pantry-tag {
+  background: #EFF6FF !important;
+  border-color: #BFDBFE !important;
+  color: #1e40af !important;
+}
+.pantry-tag button { color: #1e40af !important; }
+.pantry-tag button:hover { color: var(--vc-tomato) !important; }
+
+/* ─── Error + confirm ────────────────────────────────────────── */
 .scan-error {
   color: var(--vc-tomato);
   font-size: 0.88rem;
   margin-bottom: var(--sp-3);
 }
 
-/* Confirm button */
 .btn-confirm {
   width: 100%;
   padding: 1rem;
@@ -202,7 +291,20 @@
 }
 .btn-confirm:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 820px) {
+  .scan-layout {
+    flex-direction: column;
+  }
+  .scan-aside {
+    flex: none;
+    width: 100%;
+    position: static;
+  }
+}
+
 @media (max-width: 640px) {
   .scan-page  { padding: var(--sp-5) var(--sp-4); }
   .scan-card  { padding: var(--sp-4) var(--sp-5); }
+  .pantry-panel { padding: var(--sp-4) var(--sp-4); }
 }
