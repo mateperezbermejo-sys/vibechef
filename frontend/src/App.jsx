@@ -8,6 +8,8 @@ import ScanPage from './pages/ScanPage';
 import RecipesPage from './pages/RecipesPage';
 import HistoryPage from './pages/HistoryPage';
 import MenuPage from './pages/MenuPage';
+import HelpPage from './pages/HelpPage';
+import AccountPage from './pages/AccountPage';
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -32,6 +34,8 @@ function AppRoutes() {
           <Route path="/recipes" element={<PrivateRoute><RecipesPage /></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute><HistoryPage /></PrivateRoute>} />
           <Route path="/menu" element={<PrivateRoute><MenuPage /></PrivateRoute>} />
+          <Route path="/account" element={<PrivateRoute><AccountPage /></PrivateRoute>} />
+          <Route path="/help" element={<PrivateRoute><HelpPage /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

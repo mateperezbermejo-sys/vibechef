@@ -3,12 +3,12 @@
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Brand palette ────────────────────────────────────────── */
-  --vc-green-deep:    #1A5432;
-  --vc-green:         #2D7D46;
-  --vc-green-mid:     #3A9E5A;
-  --vc-green-pale:    #EEF8F2;
-  --vc-green-tint:    #F4FAF7;
+  /* ── Brand palette (Mercadona-inspired) ──────────────────── */
+  --vc-green-deep:    #005833;
+  --vc-green:         #007044;
+  --vc-green-mid:     #2D9058;
+  --vc-green-pale:    #E8F5EE;
+  --vc-green-tint:    #F2FAF6;
 
   --vc-tomato:        #C8442A;
   --vc-tomato-hover:  #A83520;
@@ -19,15 +19,16 @@
   --vc-ink-soft:      #3D3933;
   --vc-muted:         #7A776F;
   --vc-muted-light:   #B0ADA6;
-  --vc-warm:          #F8F5F0;
-  --vc-warm-dark:     #EFE9E1;
+  --vc-warm:          #F9F9F9;
+  --vc-warm-dark:     #EFEFEF;
+  --vc-surface:       #F9F9F9;
   --vc-white:         #FFFFFF;
-  --vc-border:        #E3DDD5;
-  --vc-border-light:  #EDE8E1;
+  --vc-border:        #DADADA;
+  --vc-border-light:  #EBEBEB;
 
-  /* ── Typography ───────────────────────────────────────────── */
-  --vc-font-head: Georgia, 'Times New Roman', 'Palatino Linotype', Palatino, serif;
-  --vc-font-body: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+  /* ── Typography (Manrope — geometric sans-serif) ──────────── */
+  --vc-font-head: 'Manrope', 'Inter', system-ui, -apple-system, sans-serif;
+  --vc-font-body: 'Manrope', system-ui, -apple-system, sans-serif;
 
   /* ── Spacing scale ────────────────────────────────────────── */
   --sp-1:  0.25rem;   --sp-2:  0.5rem;   --sp-3:  0.75rem;
@@ -35,14 +36,14 @@
   --sp-8:  2rem;      --sp-10: 2.5rem;   --sp-12: 3rem;
   --sp-16: 4rem;      --sp-20: 5rem;
 
-  /* ── Border radii ─────────────────────────────────────────── */
+  /* ── Border radii (8px base — Mercadona clean) ───────────── */
   --r-sm: 4px;  --r-md: 8px;  --r-lg: 12px;  --r-xl: 16px;  --r-pill: 100px;
 
   /* ── Shadows ──────────────────────────────────────────────── */
-  --sh-sm:    0 1px 3px rgba(26,20,16,.07), 0 1px 2px rgba(26,20,16,.04);
-  --sh-md:    0 4px 14px rgba(26,20,16,.10), 0 2px 4px rgba(26,20,16,.05);
-  --sh-lg:    0 10px 32px rgba(26,20,16,.13), 0 4px 8px rgba(26,20,16,.06);
-  --sh-focus: 0 0 0 3px rgba(45,125,70,.22);
+  --sh-sm:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --sh-md:    0 4px 14px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --sh-lg:    0 10px 32px rgba(0,0,0,.10), 0 4px 8px rgba(0,0,0,.05);
+  --sh-focus: 0 0 0 3px rgba(0,112,68,.20);
 
   /* ── Transitions ──────────────────────────────────────────── */
   --t-fast: 0.15s ease;  --t-normal: 0.25s ease;
@@ -63,7 +64,7 @@ body {
   font-size: 16px;
   line-height: 1.6;
   color: var(--vc-ink);
-  background: var(--vc-warm);
+  background: var(--vc-surface);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -75,6 +76,16 @@ h1, h2, h3, h4, h5 { line-height: 1.2; font-weight: 700; color: var(--vc-ink); }
 a { color: inherit; text-decoration: none; }
 button, input, textarea, select { font-family: var(--vc-font-body); }
 img { display: block; max-width: 100%; }
+
+/* ─── Global button tactile feedback ────────────────────────── */
+button:active { transform: scale(0.96); }
+
+/* ─── Fade-in animation ──────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.35s ease both; }
 
 /* ─── Section label ──────────────────────────────────────────── */
 .section-label {
@@ -95,4 +106,5 @@ img { display: block; max-width: 100%; }
     transition-duration: 0.01ms !important;
   }
   html { scroll-behavior: auto; }
+  button:active { transform: none; }
 }

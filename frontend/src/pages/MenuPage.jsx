@@ -93,8 +93,15 @@ export default function MenuPage() {
   return (
     <div className="menu-page">
       <div className="menu-header">
-        <h1>Menú Semanal</h1>
-        <p>Genera un plan de 7 días con comida y cena según tus ingredientes disponibles.</p>
+        <div className="menu-header-text">
+          <h1>Menú Semanal</h1>
+          <p>Genera un plan de 7 días con comida y cena según tus ingredientes disponibles.</p>
+        </div>
+        <img
+          src="/menu/platosenmovimiento.gif"
+          alt="Platos en movimiento"
+          className="menu-banner-gif"
+        />
       </div>
 
       <div className="menu-card">

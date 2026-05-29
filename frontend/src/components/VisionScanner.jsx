@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { loadModel, detectIngredients, applyUserCorrections } from '../services/visionAgent';
+import { findDemoImage, denormDetection } from '../data/demoDetections';
 import { api } from '../services/api';
 import './VisionScanner.css';
 
 const LS_IMG_MEM = 'vibechef_img_mem';
+const IS_DEV     = import.meta.env.DEV;
 
 function loadImgMem() {
   try { return JSON.parse(localStorage.getItem(LS_IMG_MEM) || '{}'); } catch { return {}; }
@@ -45,8 +47,8 @@ export default function VisionScanner({ onDetected }) {
   const naturalSizeRef = useRef({ w: 0, h: 0 });
   const drawStateRef   = useRef(null);
   const detectionsRef  = useRef([]);
-  const currentFileRef = useRef(null);  // File object for hash computation (null during webcam)
-  const imageHashRef   = useRef(null);  // 8-char hex hash of current image
+  const currentFileRef = useRef(null);
+  const imageHashRef   = useRef(null);
 
   const [modelStatus, setModelStatus]   = useState('idle');
   const [modelMode, setModelMode]       = useState('coco');
@@ -63,6 +65,8 @@ export default function VisionScanner({ onDetected }) {
   const [drawMode, setDrawMode]         = useState(false);
   const [pendingBox, setPendingBox]     = useState(null);
   const [pendingName, setPendingName]   = useState('');
+  const [demoLabel, setDemoLabel]       = useState(null);
+  const [devHash, setDevHash]           = useState(null);
 
   useEffect(() => { streamRef.current = stream; }, [stream]);
   useEffect(() => { detectionsRef.current = detections; }, [detections]);
@@ -111,6 +115,8 @@ export default function VisionScanner({ onDetected }) {
           setEditingIdx(null);
           setDrawMode(false);
           setPendingBox(null);
+          setDemoLabel(null);
+          setDevHash(null);
           clearOverlay();
           setCapturedSrc(URL.createObjectURL(file));
           return;
@@ -146,6 +152,8 @@ export default function VisionScanner({ onDetected }) {
       setEditingIdx(null);
       setDrawMode(false);
       setPendingBox(null);
+      setDemoLabel(null);
+      setDevHash(null);
       setCapturedSrc(null);
       clearOverlay();
     } catch {
@@ -162,6 +170,8 @@ export default function VisionScanner({ onDetected }) {
     setOverrides({});
     setDrawMode(false);
     setPendingBox(null);
+    setDemoLabel(null);
+    setDevHash(null);
     clearOverlay();
   }
 
@@ -177,6 +187,8 @@ export default function VisionScanner({ onDetected }) {
     setEditingIdx(null);
     setDrawMode(false);
     setPendingBox(null);
+    setDemoLabel(null);
+    setDevHash(null);
     clearOverlay();
     setCapturedSrc(URL.createObjectURL(file));
     e.target.value = '';
@@ -202,8 +214,9 @@ export default function VisionScanner({ onDetected }) {
 
     for (const det of dets) {
       const [x1, y1, x2, y2] = det.box;
-      const color = det.source === 'manual' ? '#1a6ebd'
-                  : det.needsReview          ? '#F5A623'
+      const color = det.source === 'demo'   ? '#007044'
+                  : det.source === 'manual' ? '#1a6ebd'
+                  : det.needsReview         ? '#F5A623'
                   : '#2D7D46';
       ctx.strokeStyle = color;
       ctx.lineWidth   = Math.max(2, w / 200);
@@ -211,6 +224,8 @@ export default function VisionScanner({ onDetected }) {
 
       const label = det.source === 'manual'
         ? `${det.ingredient ?? '?'} ✎`
+        : det.source === 'demo'
+        ? `${det.ingredient ?? '?'}`
         : `${det.ingredient ?? '?'} ${(det.score * 100).toFixed(0)}%`;
       const fontSize = Math.max(14, w / 40);
       ctx.font = `bold ${fontSize}px system-ui`;
@@ -294,7 +309,8 @@ export default function VisionScanner({ onDetected }) {
     setDrawMode(false);
     drawOnOverlay(updated, 0, 0);
 
-    if (imageHashRef.current) {
+    // Only persist manual boxes for non-demo images
+    if (imageHashRef.current && !demoLabel) {
       const mem  = loadImgMem();
       const slot = ensureImgSlot(mem, imageHashRef.current);
       slot.manuals.push(newDet);
@@ -314,7 +330,8 @@ export default function VisionScanner({ onDetected }) {
     const det     = detectionsRef.current[idx];
     const { w, h } = naturalSizeRef.current;
 
-    if (imageHashRef.current) {
+    // Only persist deletions for non-demo images
+    if (imageHashRef.current && !demoLabel) {
       const mem  = loadImgMem();
       const slot = ensureImgSlot(mem, imageHashRef.current);
       if (det.source === 'manual') {
@@ -347,37 +364,83 @@ export default function VisionScanner({ onDetected }) {
     drawOnOverlay(updated, 0, 0);
   }
 
+  // ── Dev tools ──────────────────────────────────────────────────
+
+  function copyHash() {
+    const hash = imageHashRef.current;
+    if (!hash) return;
+    navigator.clipboard?.writeText(hash)
+      .then(() => alert(`Hash copiado al portapapeles:\n${hash}`))
+      .catch(() => prompt('Copia este hash:', hash));
+  }
+
+  function exportDetectionsJSON() {
+    const { w, h } = naturalSizeRef.current;
+    if (!w || !h) return;
+    const exported = detectionsRef.current.map((det) => ({
+      ingredient: det.ingredient ?? '?',
+      className: det.source === 'manual' ? 'manual' : 'demo',
+      source: 'demo',
+      score: 1,
+      boxNorm: det.box.map((v, i) =>
+        parseFloat((v / (i % 2 === 0 ? w : h)).toFixed(4))
+      ),
+    }));
+    const json = JSON.stringify(exported, null, 2);
+    navigator.clipboard?.writeText(json)
+      .then(() => alert('Detecciones exportadas al portapapeles.\nPega en demoDetections.js → detections: [...]'))
+      .catch(() => prompt('Copia este JSON:', json));
+  }
+
   // ── Inference ──────────────────────────────────────────────────
 
   const runInference = useCallback(async () => {
     async function processSource(src) {
       setAnalyzing(true);
       try {
-        const raw  = await detectIngredients(src);
-        let dets   = applyUserCorrections(raw, corrections).map((d) => ({ ...d, source: 'model' }));
         const origW = src.videoWidth ?? src.naturalWidth;
         const origH = src.videoHeight ?? src.naturalHeight;
 
-        let initOverrides = {};
-
-        // Apply image memory for file/paste (not webcam)
+        // ── Demo image check (file/paste only, never webcam) ──────
         if (currentFileRef.current) {
           const hash = await computeImageHash(currentFileRef.current);
           imageHashRef.current = hash;
-          if (hash) {
-            const mem     = loadImgMem();
-            const imgMem  = mem[hash];
-            if (imgMem) {
-              // Remove detections the user previously deleted
-              dets = dets.filter((d) => !(imgMem.deleted || []).includes(detSig(d, origW, origH)));
-              // Pre-populate overrides for previously renamed detections
-              dets.forEach((d, i) => {
-                const rename = imgMem.renames?.[detSig(d, origW, origH)];
-                if (rename) initOverrides[i] = rename;
-              });
-              // Re-add manual detections the user previously drew
-              dets = [...dets, ...(imgMem.manuals || [])];
-            }
+          if (IS_DEV) setDevHash(hash);
+
+          const filename = currentFileRef.current.name ?? '';
+          const demoConfig = findDemoImage(hash, filename);
+
+          if (demoConfig) {
+            setDemoLabel(demoConfig.label);
+            const dets = demoConfig.detections.map((d) => denormDetection(d, origW, origH));
+            setDetections(dets);
+            setOverrides({});
+            setEditingIdx(null);
+            setDrawMode(false);
+            setPendingBox(null);
+            drawOnOverlay(dets, origW, origH);
+            return;
+          }
+
+          setDemoLabel(null);
+        }
+
+        // ── Normal YOLO flow ──────────────────────────────────────
+        const raw  = await detectIngredients(src);
+        let dets   = applyUserCorrections(raw, corrections).map((d) => ({ ...d, source: 'model' }));
+
+        let initOverrides = {};
+
+        if (imageHashRef.current) {
+          const mem     = loadImgMem();
+          const imgMem  = mem[imageHashRef.current];
+          if (imgMem) {
+            dets = dets.filter((d) => !(imgMem.deleted || []).includes(detSig(d, origW, origH)));
+            dets.forEach((d, i) => {
+              const rename = imgMem.renames?.[detSig(d, origW, origH)];
+              if (rename) initOverrides[i] = rename;
+            });
+            dets = [...dets, ...(imgMem.manuals || [])];
           }
         }
 
@@ -418,8 +481,8 @@ export default function VisionScanner({ onDetected }) {
       await api.corrections.save(det.className, chosen);
       setCorrections((prev) => ({ ...prev, [det.className]: chosen }));
 
-      // Also persist rename in per-image memory
-      if (imageHashRef.current && det.source !== 'manual') {
+      // Persist rename in per-image memory (only for non-demo images)
+      if (imageHashRef.current && !demoLabel && det.source !== 'manual') {
         const { w, h } = naturalSizeRef.current;
         const mem  = loadImgMem();
         const slot = ensureImgSlot(mem, imageHashRef.current);
@@ -446,6 +509,7 @@ export default function VisionScanner({ onDetected }) {
     setEditingIdx(null);
     setDrawMode(false);
     setPendingBox(null);
+    setDemoLabel(null);
     clearOverlay();
   }
 
@@ -544,6 +608,12 @@ export default function VisionScanner({ onDetected }) {
                 onMouseUp={handleCanvasMouseUp}
                 onMouseLeave={handleCanvasMouseUp}
               />
+              {/* Demo badge — shown when a demo image is recognised */}
+              {demoLabel && (
+                <div className="demo-badge" role="status">
+                  ✓ Imagen de demo
+                </div>
+              )}
             </div>
           )}
 
@@ -614,22 +684,25 @@ export default function VisionScanner({ onDetected }) {
                   const isSaving   = savingIdx === idx;
                   const wasChanged = overrides[idx] !== undefined && overrides[idx] !== det.ingredient;
                   const isManual   = det.source === 'manual';
+                  const isDemo     = det.source === 'demo';
 
                   return (
                     <div
                       key={idx}
-                      className={`detection-item ${det.needsReview ? 'needs-review' : ''} ${isManual ? 'manual-item' : ''}`}
+                      className={`detection-item ${det.needsReview ? 'needs-review' : ''} ${isManual ? 'manual-item' : ''} ${isDemo ? 'demo-item' : ''}`}
                     >
                       <div className="det-main-row">
                         {isManual ? (
                           <span className="det-confidence-badge manual">✎ manual</span>
+                        ) : isDemo ? (
+                          <span className="det-confidence-badge demo">✓ demo</span>
                         ) : det.needsReview ? (
                           <span className="det-confidence-badge low">⚠️ {(det.score * 100).toFixed(0)}%</span>
                         ) : (
                           <span className="det-confidence-badge ok">✅ {(det.score * 100).toFixed(0)}%</span>
                         )}
                         <span className="det-name">{eff ?? '—'}</span>
-                        {!isManual && <span className="det-class">({det.className})</span>}
+                        {!isManual && !isDemo && <span className="det-class">({det.className})</span>}
                         {det.correctedByHistory && <span className="det-history-badge">historial</span>}
                         {wasChanged && <span className="det-history-badge changed">editado</span>}
                         <button
@@ -650,7 +723,7 @@ export default function VisionScanner({ onDetected }) {
 
                       {isEditing && (
                         <div className="det-edit-row">
-                          {!isManual && (
+                          {!isManual && !isDemo && (
                             <div className="det-candidates">
                               {det.candidates
                                 .filter((c) => c.ingredient)
@@ -674,7 +747,7 @@ export default function VisionScanner({ onDetected }) {
                             onChange={(e) => setOverrides((p) => ({ ...p, [idx]: e.target.value.toLowerCase().trim() }))}
                           />
                           <div className="det-edit-actions">
-                            {!isManual && (
+                            {!isManual && !isDemo && (
                               <button
                                 className="btn-save-correction"
                                 onClick={() => handleSaveCorrection(det, idx)}
@@ -684,7 +757,7 @@ export default function VisionScanner({ onDetected }) {
                               </button>
                             )}
                             <button className="btn-cancel-edit" onClick={() => setEditingIdx(null)}>
-                              {isManual ? 'Cerrar' : 'Cancelar'}
+                              {isManual || isDemo ? 'Cerrar' : 'Cancelar'}
                             </button>
                           </div>
                         </div>
@@ -704,6 +777,22 @@ export default function VisionScanner({ onDetected }) {
             <p className="no-detections-hint">
               Pulsa "Detectar alimentos" para analizar la imagen.
             </p>
+          )}
+
+          {/* ── Dev tools (only in development mode) ───────────── */}
+          {IS_DEV && mode === 'image' && devHash && (
+            <div className="dev-tools-row">
+              <span className="dev-label">🛠 DEV</span>
+              <code className="dev-hash" title="SHA-256 prefix (16 hex chars)">{devHash}</code>
+              <button className="dev-btn" onClick={copyHash}>
+                Copiar hash
+              </button>
+              {detections.length > 0 && (
+                <button className="dev-btn" onClick={exportDetectionsJSON}>
+                  Exportar detecciones JSON
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}

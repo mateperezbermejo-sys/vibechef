@@ -1,5 +1,5 @@
 const { getDb } = require('../db/database');
-const { scoreRecipe, filterByAllergies, sortRecipes } = require('../utils/recipeUtils');
+const { scoreRecipe, filterByAllergies, sortRecipes, translateIngredients } = require('../utils/recipeUtils');
 
 function matchRecipes(req, res) {
   try {
@@ -10,7 +10,7 @@ function matchRecipes(req, res) {
     }
 
     const db = getDb();
-    const normalizedInput = ingredients.map((i) => i.toLowerCase().trim());
+    const normalizedInput = translateIngredients(ingredients.map((i) => i.toLowerCase().trim()));
 
     // Load user allergies to apply automatic filtering
     const allergyRows = db.prepare(
@@ -49,8 +49,9 @@ function matchRecipes(req, res) {
       };
     });
 
-    // Keep only recipes with at least 1 matched ingredient
-    let filtered = scored.filter((r) => r.score > 0);
+    // Keep only recipes with at least 1 matched ingredient.
+    // Missing ingredients can be bought or taken from pantry.
+    let filtered = scored.filter((r) => r.matchCount >= 1);
 
     // Apply allergy filter — remove recipes containing allergens
     filtered = filterByAllergies(filtered, allergies);

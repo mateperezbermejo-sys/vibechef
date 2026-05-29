@@ -5,20 +5,37 @@
 }
 
 /* ─── Header ─────────────────────────────────────────────────── */
-.menu-header { margin-bottom: var(--sp-8); }
+.menu-header {
+  margin-bottom: var(--sp-8);
+  background: #1a3a2a;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.menu-header-text {
+  padding: var(--sp-6) var(--sp-6) var(--sp-5);
+}
 
 .menu-header h1 {
   font-family: var(--vc-font-head);
   font-size: 1.7rem;
   margin: 0 0 var(--sp-2);
-  color: var(--vc-ink);
+  color: #ffffff;
   letter-spacing: -0.02em;
 }
 
 .menu-header p {
   margin: 0;
-  color: var(--vc-muted);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 0.92rem;
+}
+
+.menu-banner-gif {
+  display: block;
+  width: 100%;
+  max-height: 190px;
+  object-fit: cover;
+  object-position: center;
 }
 
 /* ─── Config cards ───────────────────────────────────────────── */
@@ -383,10 +400,13 @@
 
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .menu-page  { padding: var(--sp-5) var(--sp-4); }
-  .menu-card  { padding: var(--sp-4) var(--sp-5); }
-  .day-name   { padding: var(--sp-3) var(--sp-4); }
-  .meal-slot  { padding: var(--sp-3) var(--sp-4); }
-  .meal-header { gap: var(--sp-2); }
-  .meal-meta  { display: none; }
+  .menu-page       { padding: var(--sp-5) var(--sp-4); }
+  .menu-header-text { padding: var(--sp-4) var(--sp-4) var(--sp-4); }
+  .menu-header h1  { font-size: 1.35rem; }
+  .menu-banner-gif { max-height: 130px; }
+  .menu-card       { padding: var(--sp-4) var(--sp-5); }
+  .day-name        { padding: var(--sp-3) var(--sp-4); }
+  .meal-slot       { padding: var(--sp-3) var(--sp-4); }
+  .meal-header     { gap: var(--sp-2); }
+  .meal-meta       { display: none; }
 }

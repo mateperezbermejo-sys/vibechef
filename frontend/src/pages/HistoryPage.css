@@ -1,4 +1,46 @@
 .myfoods-page {
+  min-height: calc(100dvh - var(--navbar-h));
+  background: var(--vc-surface);
+}
+
+/* ─── Slogan banner ──────────────────────────────────────────── */
+.myfoods-slogan {
+  background: linear-gradient(135deg, #004d30 0%, #007044 55%, #1a8055 100%);
+  padding: var(--sp-12) var(--sp-8);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.myfoods-slogan::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.myfoods-slogan-text {
+  font-family: var(--vc-font-head);
+  font-size: clamp(2rem, 5.5vw, 4rem);
+  font-weight: 900;
+  color: var(--vc-white);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.myfoods-slogan-text span {
+  display: block;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  color: rgba(255,255,255,.92);
+}
+
+/* ─── Inner content wrapper ──────────────────────────────────── */
+.myfoods-inner {
   max-width: 860px;
   margin: 0 auto;
   padding: var(--sp-8) var(--sp-6);
@@ -153,7 +195,8 @@
 
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .myfoods-page { padding: var(--sp-5) var(--sp-4); }
-  .myfoods-grid { grid-template-columns: 1fr; }
-  .myfoods-card { padding: var(--sp-5); }
+  .myfoods-slogan { padding: var(--sp-8) var(--sp-5); }
+  .myfoods-inner  { padding: var(--sp-5) var(--sp-4); }
+  .myfoods-grid   { grid-template-columns: 1fr; }
+  .myfoods-card   { padding: var(--sp-5); }
 }

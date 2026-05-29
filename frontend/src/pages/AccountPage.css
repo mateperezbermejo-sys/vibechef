@@ -1,0 +1,329 @@
+.account-page {
+  min-height: calc(100dvh - var(--navbar-h));
+  background: var(--vc-surface);
+  padding: var(--sp-10) var(--sp-8);
+}
+
+.account-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.account-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  padding-bottom: var(--sp-6);
+  border-bottom: 1px solid var(--vc-border-light);
+}
+
+.account-avatar-lg {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--vc-green);
+  color: var(--vc-white);
+  font-size: 1.6rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(0,112,68,.25);
+}
+
+.account-heading {
+  font-family: var(--vc-font-head);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--vc-ink);
+  margin: 0 0 var(--sp-1);
+  letter-spacing: -0.03em;
+}
+
+.account-email {
+  font-size: 0.875rem;
+  color: var(--vc-muted);
+  margin: 0;
+}
+
+/* ── Card ────────────────────────────────────────────────────────── */
+.account-card {
+  background: var(--vc-white);
+  border: 1px solid var(--vc-border-light);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  box-shadow: var(--sh-sm);
+}
+
+.account-card--danger {
+  border-color: #FED7D7;
+}
+
+.account-card-head {
+  margin-bottom: var(--sp-5);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--vc-border-light);
+}
+
+.account-card-head h2 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--vc-ink);
+  margin: 0 0 var(--sp-1);
+  letter-spacing: -0.01em;
+}
+
+.account-card-head p {
+  font-size: 0.85rem;
+  color: var(--vc-muted);
+  margin: 0;
+}
+
+/* ── Form ────────────────────────────────────────────────────────── */
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.account-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.account-field label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--vc-ink-soft);
+}
+
+.account-field input {
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid var(--vc-border);
+  border-radius: var(--r-md);
+  font-size: 0.9rem;
+  color: var(--vc-ink);
+  background: var(--vc-white);
+  font-family: var(--vc-font-body);
+  outline: none;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.account-field input:focus { border-color: var(--vc-green); box-shadow: var(--sh-focus); }
+.account-input--disabled {
+  background: var(--vc-surface) !important;
+  color: var(--vc-muted) !important;
+  cursor: not-allowed;
+}
+
+.account-field-hint {
+  font-size: 0.76rem;
+  color: var(--vc-muted-light);
+}
+
+.account-form-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.account-saved {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--vc-green);
+}
+
+.account-error {
+  font-size: 0.85rem;
+  color: var(--vc-tomato);
+  background: var(--vc-tomato-pale);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  margin: 0;
+}
+
+.account-ok-banner {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vc-green);
+  background: var(--vc-green-pale);
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid #c3e6cd;
+}
+
+/* ── Stats ───────────────────────────────────────────────────────── */
+.account-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.account-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--vc-surface);
+  border-radius: var(--r-md);
+  border: 1px solid var(--vc-border-light);
+}
+
+.account-stat-icon { font-size: 1.6rem; flex-shrink: 0; }
+
+.account-stat > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-stat strong {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--vc-ink);
+  margin-bottom: 2px;
+}
+
+.account-stat span {
+  font-size: 0.78rem;
+  color: var(--vc-muted);
+}
+
+/* ── Danger zone rows ────────────────────────────────────────────── */
+.account-logout-row,
+.account-delete-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
+}
+
+.account-logout-row + .account-delete-row {
+  border-top: 1px solid #FED7D7;
+  margin-top: var(--sp-2);
+}
+
+.account-logout-row strong,
+.account-delete-row strong {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--vc-ink);
+  margin-bottom: 2px;
+}
+
+.account-logout-row p,
+.account-delete-row p {
+  font-size: 0.82rem;
+  color: var(--vc-muted);
+  margin: 0;
+}
+
+.account-delete-confirm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.account-delete-confirm p {
+  font-size: 0.875rem;
+  color: var(--vc-ink-soft);
+  margin: 0;
+}
+
+.account-delete-confirm input {
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid #FCA5A5;
+  border-radius: var(--r-md);
+  font-size: 0.9rem;
+  font-family: var(--vc-font-body);
+  outline: none;
+  background: #FFF5F5;
+}
+.account-delete-confirm input:focus { border-color: var(--vc-tomato); }
+
+.account-delete-btns {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.btn-account-primary {
+  padding: 0.75rem 1.6rem;
+  background: var(--vc-green);
+  color: var(--vc-white);
+  border: none;
+  border-radius: var(--r-md);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--vc-font-body);
+  transition: background var(--t-fast), box-shadow var(--t-fast);
+  box-shadow: 0 2px 8px rgba(0,112,68,.22);
+}
+.btn-account-primary:hover { background: var(--vc-green-deep); }
+.btn-account-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-account-ghost {
+  padding: 0.55rem 1rem;
+  background: var(--vc-surface);
+  color: var(--vc-ink-soft);
+  border: 1.5px solid var(--vc-border);
+  border-radius: var(--r-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--vc-font-body);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--t-fast);
+}
+.btn-account-ghost:hover { border-color: var(--vc-green); color: var(--vc-green); background: var(--vc-green-pale); }
+
+.btn-account-outline {
+  padding: 0.6rem 1.2rem;
+  background: transparent;
+  color: var(--vc-muted);
+  border: 1.5px solid var(--vc-border);
+  border-radius: var(--r-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--vc-font-body);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--t-fast);
+}
+.btn-account-outline:hover { border-color: var(--vc-tomato); color: var(--vc-tomato); background: var(--vc-tomato-pale); }
+
+.btn-account-danger {
+  padding: 0.6rem 1.2rem;
+  background: #DC2626;
+  color: white;
+  border: none;
+  border-radius: var(--r-md);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--vc-font-body);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background var(--t-fast);
+}
+.btn-account-danger:hover { background: #B91C1C; }
+.btn-account-danger:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .account-page { padding: var(--sp-6) var(--sp-4); }
+  .account-header { flex-direction: column; text-align: center; }
+  .account-logout-row,
+  .account-delete-row { flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
+}

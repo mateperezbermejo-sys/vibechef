@@ -36,6 +36,13 @@ export default function HistoryPage() {
 
   return (
     <div className="myfoods-page">
+
+      {/* ── Slogan banner ───────────────────────────────────────── */}
+      <div className="myfoods-slogan" aria-label="Eslogan">
+        <p className="myfoods-slogan-text">¿Lo tienes?<br /><span>¡Cocínalo!</span></p>
+      </div>
+
+      <div className="myfoods-inner">
       <div className="myfoods-header">
         <h1>Mis alimentos</h1>
         <p className="myfoods-sub">Todo lo que tienes en casa, listo para cocinar.</p>
@@ -101,6 +108,7 @@ export default function HistoryPage() {
             </div>
           )}
         </section>
+      </div>
       </div>
     </div>
   );

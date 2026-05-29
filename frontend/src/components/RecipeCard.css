@@ -1,16 +1,17 @@
 /* ─── Card shell ─────────────────────────────────────────────── */
 .rcard {
   background: var(--vc-white);
-  border: 1px solid var(--vc-border-light);
+  border: 1px solid var(--vc-border);
   border-radius: var(--r-lg);
   overflow: hidden;
   box-shadow: var(--sh-sm);
   cursor: pointer;
   transition: box-shadow var(--t-normal), transform var(--t-normal);
+  animation: fadeIn 0.35s ease both;
 }
 .rcard:hover {
   box-shadow: var(--sh-md);
-  transform: translateY(-2px);
+  transform: scale(1.02);
 }
 .rcard--high { border-left: 3px solid var(--vc-green); }
 
@@ -28,12 +29,12 @@
   display: block;
   transition: transform 0.4s ease;
 }
-.rcard:hover .rcard-img img { transform: scale(1.04); }
+.rcard:hover .rcard-img img { transform: scale(1.06); }
 
 .rcard-img-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #f8f1e8 0%, #f0e4d0 45%, #e8d4b8 100%);
+  background: linear-gradient(135deg, var(--vc-green-tint) 0%, var(--vc-green-pale) 100%);
 }
 
 /* ─── Match bar ──────────────────────────────────────────────── */
@@ -67,7 +68,7 @@
 .rcard-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.18rem 0.55rem;
+  padding: 0.2rem 0.6rem;
   border-radius: var(--r-pill);
   font-size: 0.7rem;
   font-weight: 700;
@@ -76,20 +77,20 @@
   line-height: 1.4;
 }
 
-.rcard-badge--easy   { background: var(--vc-green-pale);   color: var(--vc-green-deep); }
-.rcard-badge--medium { background: #FEF9C3; color: #92400E; }
-.rcard-badge--hard   { background: var(--vc-tomato-pale);  color: var(--vc-tomato); }
-.rcard-badge--time   { background: var(--vc-warm-dark);    color: var(--vc-muted); }
-.rcard-badge--match  { background: var(--vc-green);        color: var(--vc-white); }
+.rcard-badge--easy   { background: var(--vc-green-pale);  color: var(--vc-green-deep); }
+.rcard-badge--medium { background: #FEF9C3;               color: #92400E; }
+.rcard-badge--hard   { background: var(--vc-tomato-pale); color: var(--vc-tomato); }
+.rcard-badge--time   { background: var(--vc-warm-dark);   color: var(--vc-muted); }
+.rcard-badge--match  { background: var(--vc-green);       color: var(--vc-white); }
 
 /* ─── Name ───────────────────────────────────────────────────── */
 .rcard-name {
   font-family: var(--vc-font-head);
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 800;
   color: var(--vc-ink);
   margin: 0 0 var(--sp-2);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   line-height: 1.3;
 }
 
@@ -100,7 +101,7 @@
   margin: 0 0 var(--sp-4);
 }
 .rcard-miss-count { color: var(--vc-tomato); font-weight: 700; }
-.rcard-miss-zero  { color: var(--vc-green);  font-weight: 600; }
+.rcard-miss-zero  { color: var(--vc-green);  font-weight: 700; }
 
 /* ─── Footer ─────────────────────────────────────────────────── */
 .rcard-footer {
@@ -130,7 +131,7 @@
 /* ─── CTA ────────────────────────────────────────────────────── */
 .rcard-cta {
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--vc-green);
   white-space: nowrap;
   flex-shrink: 0;

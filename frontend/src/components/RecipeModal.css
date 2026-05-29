@@ -82,7 +82,7 @@
 .rmodal-title {
   font-family: var(--vc-font-head);
   font-size: 1.45rem;
-  font-weight: 700;
+  font-weight: 900;
   color: var(--vc-ink);
   margin: 0 0 var(--sp-2);
   letter-spacing: -0.02em;
@@ -184,14 +184,15 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--vc-green-pale);
-  color: var(--vc-green-deep);
-  font-size: 0.72rem;
-  font-weight: 700;
+  color: var(--vc-green);
+  font-size: 0.95rem;
+  font-weight: 900;
   margin-top: 1px;
+  font-family: var(--vc-font-head);
 }
 
 /* ─── Raw instructions fallback ───────────────────────────────── */

@@ -353,3 +353,64 @@
 .btn-add-detected:hover { background: var(--vc-green-deep); }
 
 .no-detections-hint { font-size: 0.85rem; color: var(--vc-muted-light); text-align: center; margin: 0; }
+
+/* ─── Demo badge (viewport overlay) ─────────────────────────── */
+.demo-badge {
+  position: absolute;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  background: rgba(0, 112, 68, 0.82);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--r-pill);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ─── Demo detection item ────────────────────────────────────── */
+.det-confidence-badge.demo { background: var(--vc-green-pale); color: var(--vc-green-deep); }
+.detection-item.demo-item  { border-color: #c3e6cd; background: #F4FBF6; }
+
+/* ─── Dev tools row (DEV mode only) ─────────────────────────── */
+.dev-tools-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: #1e1e1e;
+  border-radius: var(--r-md);
+  font-size: 0.78rem;
+}
+.dev-label {
+  font-weight: 700;
+  color: #F5A623;
+  white-space: nowrap;
+}
+.dev-hash {
+  font-family: monospace;
+  font-size: 0.78rem;
+  color: #9cdcfe;
+  background: #2d2d2d;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--r-sm);
+  user-select: all;
+  cursor: text;
+}
+.dev-btn {
+  padding: 0.25rem 0.6rem;
+  background: #3c3c3c;
+  color: #d4d4d4;
+  border: 1px solid #555;
+  border-radius: var(--r-sm);
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+  white-space: nowrap;
+}
+.dev-btn:hover { background: #555; color: #fff; }

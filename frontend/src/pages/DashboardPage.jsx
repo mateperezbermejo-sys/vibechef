@@ -60,6 +60,20 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {/* Background video — right side */}
+        <video
+          className="hero-video"
+          src="/pero_q_dure_un_pco_mas_el_vide.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-hidden="true"
+        />
+
+        {/* Brighten video center to reduce green tint */}
+        <div className="hero-video-brighten" aria-hidden="true" />
+
         {/* Subtle radial glow */}
         <div className="hero-glow" aria-hidden="true" />
 
