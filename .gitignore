@@ -27,8 +27,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# ONNX model binary (large file, download separately)
-frontend/public/models/*.onnx
 
 # WASM runtime binaries (installed via npm, not committed)
 frontend/public/ort-wasm/
